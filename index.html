@@ -438,37 +438,58 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="text-3xl font-bold text-center mb-12">Side Projects</h2>
           <div class="grid md:grid-cols-2 gap-8 justify-center">
+            <!-- Project 3: GIS Application -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+              <iframe src="https://afiqaidit.github.io/Mapping/index.html?KodNegeri=00" class="w-full h-96" frameborder="0"></iframe>
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">GIS Application</h3>
+                <p class="text-gray-600">
+                  Explore my GIS web application that provides interactive mapping and geospatial analysis tools.
+                </p>
+                <div class="flex space-x-2 mt-2">
+                  <button onclick="openFullscreen()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                    Open Full Screen
+                  </button>
+                  <a href="https://afiqaidit.github.io/Mapping/index.html" target="_blank" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+                    Open in New Tab
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- Project 3: PSMS BETA -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+              <div class="flex justify-center items-center bg-gray-400 h-96">
+                <img src="assets/project/PSMS/PSMS_BETA/PSMS_Logo_2.ico" alt="PSMS BETA" class="h-59 max-w-full">
+              </div>
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">PSMS BETA</h3>
+                <p class="text-gray-600">
+                  An application designed for the early detection of project development success and failure rates, featuring a user-friendly interface for managing project metrics and analytics. The system includes database integration and secure data handling.
+                </p>
+                <a href="assets/project/PSMS/PSMS_BETA/PSMS_Beta.exe" class="text-indigo-600 hover:text-indigo-800" download>
+                  Download Application
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-8 justify-center mt-8">
             <!-- Project 1 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-              <video
-                src="assets/project/travelog.mp4"
-                class="w-full h-80 object-cover"
-                controls
-              ></video>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+              <video src="assets/project/travelog.mp4" class="w-full h-80 object-cover" controls></video>
               <div class="p-6">
                 <h3 class="text-xl font-semibold mb-2">Travelog</h3>
                 <p class="text-gray-600">
-                  A mobile application showcasing famous places in Melacca,
-                  providing all necessary information for travelers. Developed
-                  using Java and Android Studio, it offers an intuitive
-                  interface for exploring local attractions.
+                  A mobile application showcasing famous places in Melacca, providing all necessary information for travelers. Developed using Java and Android Studio, it offers an intuitive interface for exploring local attractions.
                 </p>
               </div>
             </div>
             <!-- Project 2 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-              <video
-                src="assets/project/tekaki.mp4"
-                class="w-full h-80 object-cover"
-                controls
-              ></video>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden transition-transform transform hover:scale-105">
+              <video src="assets/project/tekaki.mp4" class="w-full h-80 object-cover" controls></video>
               <div class="p-6">
                 <h3 class="text-xl font-semibold mb-2">Tekaki</h3>
                 <p class="text-gray-600">
-                  A Java-based project utilizing TCP network connections to
-                  facilitate communication between server and client. It
-                  demonstrates the fundamentals of network programming and
-                  client-server architecture.
+                  A Java-based project utilizing TCP network connections to facilitate communication between server and client. It demonstrates the fundamentals of network programming and client-server architecture.
                 </p>
               </div>
             </div>
@@ -633,12 +654,29 @@
         retina_detect: true,
       });
 
-      document.getElementById('contact-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-        alert('Thank you for reaching out! Your message has been successfully sent. We will get back to you shortly.');
-        // Optionally, clear the form fields
-        this.reset();
-      });
+      document
+        .getElementById("contact-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent default form submission
+          alert(
+            "Thank you for reaching out! Your message has been successfully sent. We will get back to you shortly."
+          );
+          // Optionally, clear the form fields
+          this.reset();
+        });
+
+      function openFullscreen() {
+        const iframe = document.querySelector('iframe');
+        if (iframe.requestFullscreen) {
+          iframe.requestFullscreen();
+        } else if (iframe.mozRequestFullScreen) { // Firefox
+          iframe.mozRequestFullScreen();
+        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
+          iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { // IE/Edge
+          iframe.msRequestFullscreen();
+        }
+      }
     </script>
   </body>
 </html>
