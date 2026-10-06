@@ -1,0 +1,85 @@
+export type ExperienceRole = {
+  company: string;
+  title: string;
+  period: string;
+  note?: string;
+  highlights: { label?: string; text: string }[];
+};
+
+export const experience: ExperienceRole[] = [
+  {
+    company: "Selangkah Ventures Sdn Bhd",
+    title: "Full Stack Developer",
+    period: "August 2025 — Present",
+    highlights: [
+      {
+        label: "Selangkah Plus",
+        text: "Develop and maintain the revamped Spring Boot backend (Java 21, Spring Data JPA, MySQL) for the Selangkah mobile app; REST endpoints documented with Swagger; contributed most new database work as part of a team.",
+      },
+      {
+        label: "Selangkah",
+        text: "Maintain the original Spring Boot backend with bug fixes and enhancements.",
+      },
+      {
+        label: "Integration",
+        text: "Connected SCMS and SDMS to the Selangkah app using IC as the unique identifier — clinic documents, EMR records, and appointment booking flows.",
+      },
+      {
+        label: "SCMS",
+        text: "Stabilized Selcare Clinic Management System (Laravel, Voyager) after go-live — production fixes, enhancements, digital prescription stickers, MSC Trustgate SOAP signing.",
+      },
+      {
+        label: "SDMS",
+        text: "Built Selcare Dental Management System end to end — requirements, UI/UX, database, deployment, in-dashboard guides, Trustgate signing, Selangkah document delivery.",
+      },
+      {
+        label: "VSURE",
+        text: "Built insurance platform backend in NestJS, TypeScript, TypeORM, MySQL — plans, claims, nominees.",
+      },
+      {
+        label: "Selgate website",
+        text: "Next.js hospital site with 360° VR views; deployed on BytePlus via Git.",
+      },
+    ],
+  },
+  {
+    company: "Puncak Tegap Sdn Bhd",
+    title: "GIS Developer / Full Stack Developer",
+    period: "November 2024 — August 2025",
+    highlights: [
+      {
+        label: "eTanah",
+        text: "Revamped and maintained GIS web application for Putrajaya and Labuan on UI and backend.",
+      },
+      {
+        label: "GIS",
+        text: "Sole developer: OpenLayers & Leaflet frontend, C# backend, GeoServer, PostgreSQL — first production deployment.",
+      },
+      {
+        text: "Production support from Redmine, UAT, and user training before go-live.",
+      },
+    ],
+  },
+  {
+    company: "Elcorp Technology Sdn Bhd",
+    title: "Back-end Developer",
+    period: "February 2024 — May 2024",
+    note: "Short-term project contract",
+    highlights: [
+      {
+        text: "Project monitoring and Sakit Detection features in Java, JDBC, MySQL — Figma wireframes, probability graph, detection algorithm, licensing integration.",
+      },
+    ],
+  },
+  {
+    company: "Finexus International Sdn Bhd",
+    title: "Back-end Developer (Internship)",
+    period: "September 2023 — January 2024",
+    highlights: [
+      {
+        label: "CARDWORKS",
+        text: "Java and SQL on card management system — API enhancements, concurrent performance tests, encryption, Jaspersoft stakeholder reports.",
+      },
+    ],
+  },
+];
