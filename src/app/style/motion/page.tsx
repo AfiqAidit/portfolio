@@ -7,7 +7,8 @@ import {
 } from "@/components/shared/sections";
 import { MotionHero, MotionFeaturedBento } from "@/components/motion/MotionSections";
 
-export default function HomePage() {
+/** Same as home — keeps /style/motion usable from the layout switcher */
+export default function MotionStylePage() {
   return (
     <>
       <SiteNav />

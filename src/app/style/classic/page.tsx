@@ -1,18 +1,20 @@
 import { SiteNav, SiteFooter } from "@/components/shared/SiteNav";
 import {
+  SharedHero,
+  FeaturedGrid,
   ExperienceList,
   UniversitySection,
   EducationSection,
   SkillsSection,
 } from "@/components/shared/sections";
-import { MotionHero, MotionFeaturedBento } from "@/components/motion/MotionSections";
 
-export default function HomePage() {
+/** Archived layout preview — main site is `/` (motion + classic sections). */
+export default function ClassicStylePage() {
   return (
     <>
       <SiteNav />
-      <MotionHero />
-      <MotionFeaturedBento />
+      <SharedHero variant="Classic (archive)" />
+      <FeaturedGrid />
       <ExperienceList />
       <UniversitySection />
       <EducationSection />
