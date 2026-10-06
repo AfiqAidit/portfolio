@@ -1,0 +1,36 @@
+---
+description: Portfolio product direction, content sources, and phased roadmap
+alwaysApply: true
+---
+
+# Portfolio — direction
+
+## Identity
+
+- Owner: Muhammad Afiq Aidit Bin Mohd Ariff
+- Public title: **Software Engineer** (not “Java developer” alone unless a job-specific fork)
+- Primary contact on site: **email only** → `afiqariff9314@gmail.com` (no phone/GitHub in footer until user adds them)
+
+## Content
+
+- **Single source of truth:** `src/content/*.ts` — never duplicate copy in components
+- Resume HTML: `/resume` from same content; PDF export is a later phase
+- Work bullets: NDA-safe, impact-oriented; sync from user’s resume markdown when they update it
+- University/SIG projects stay in `education.ts` until user removes them
+
+## Layout decision (preview → production)
+
+- **Shipped:** `/` = Motion hero + GSAP scroll + **bento featured grid** + **classic** experience/education/skills
+- Archive: `/style/classic`, `/style/bento` for comparison only
+- **Theme:** light + dark via `next-themes` (class on `html`); tokens in `globals.css`
+
+## Roadmap
+
+1. Baseline site + chosen layout (Motion + bento tiles)
+2. Per-employer demos (e.g. Puncak Tegap → Leaflet at `/demos/...`)
+3. Custom domain + GitHub public repo (commit email must match GitHub for contribution graph)
+4. Optional: PDF resume, LinkedIn/GitHub links when user provides URLs
+
+## Stack (do not swap without discussion)
+
+Next.js App Router, TypeScript, Tailwind CSS, Framer Motion (light UI), GSAP (hero/scroll only unless requested)

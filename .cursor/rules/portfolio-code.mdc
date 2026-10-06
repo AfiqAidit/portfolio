@@ -1,0 +1,44 @@
+---
+description: Code structure, cleanliness, and Next.js conventions
+globs: src/**/*
+alwaysApply: false
+---
+
+# Code conventions
+
+## Structure
+
+```
+src/content/          # typed data only
+src/components/shared/
+src/components/motion/   # GSAP client components
+src/components/bento/    # grid layouts (reuse tiles in main page)
+src/app/                 # routes; prefer one main `/` when preview ends
+```
+
+## TypeScript & React
+
+- Prefer **server components** for static sections; `"use client"` only for Framer/GSAP/DOM hooks
+- Export types next to content (`ExperienceRole`, etc.)
+- No `any`; no empty catch blocks
+- Import alias `@/` for all internal paths
+
+## Styling
+
+- Tailwind only — no inline styles except rare GSAP transforms
+- Reuse tokens from `globals.css`; don’t introduce second color systems
+
+## Changes
+
+- **Minimal diffs** — don’t refactor unrelated files when editing copy (touch `src/content/` only)
+- Run `npm run build` after structural/route changes
+- Don’t commit secrets, `.env`, or user resume PDFs from Downloads
+
+## Content edits
+
+```typescript
+// ✅ GOOD — update data
+// src/content/experience.ts
+
+// ❌ BAD — hardcoded job bullets in page.tsx
+```

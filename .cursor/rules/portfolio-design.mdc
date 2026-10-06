@@ -1,0 +1,36 @@
+---
+description: Visual design system and motion rules for portfolio UI
+globs: src/**/*.tsx,src/**/*.css
+alwaysApply: false
+---
+
+# Design system
+
+## Theme
+
+- **Light and dark** via CSS variables in `globals.css` (`:root` / `.dark`); toggle in `SiteNav`
+- Accent: sky (`--accent`); avoid purple-on-black “AI slop” gradients
+- Borders: `border-border`; surfaces: `var(--card-muted)` or subtle gradients on project cards only
+
+## Typography
+
+- One sans stack (Geist via layout); uppercase micro-labels with `tracking-[0.2em]` for section titles
+- Hero: large semibold title; body max-width ~`max-w-2xl` for readability
+
+## Layout patterns
+
+- **Motion page:** vertical narrative — hero → featured grid → experience → university → education → skills → footer
+- **Bento pattern (partial):** 12-column grid, `rounded-3xl` cards, varied `col-span` for featured projects only
+- Do not put full job history in a single bento cell with `line-clamp` in production
+
+## Motion & a11y
+
+- Respect `prefers-reduced-motion`: disable GSAP/Framer entrance animations when set
+- No ENTER splash gates (bad SEO/a11y)
+- Keep animation **subtle** — no full-page WebGL/Three.js unless explicitly requested
+- GSAP: use `gsap.context` + cleanup in `useEffect`; register ScrollTrigger once per client module
+
+## Components
+
+- Shared chrome: `StyleNav`, `SiteFooter`, `ContactEmail` in `components/shared/`
+- Section blocks: `components/shared/sections.tsx` — reuse before forking layouts
