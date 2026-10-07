@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import { DisplayClient } from "@/components/demos/clinic-queue/DisplayClient";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Clinic queue demo: Display",
-  description: "Waiting room display for the fictional clinic queue demo.",
-};
-
-export default function ClinicDisplayPage() {
-  return <DisplayClient />;
+/** Former waiting-room URL; doctor view includes the public board. */
+export default function ClinicDisplayRedirectPage() {
+  redirect("/demos/clinic-queue/doctor");
 }
