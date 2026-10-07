@@ -94,6 +94,10 @@ export function bookingsInSlot(tickets: BookableTicket[], slotIsoStr: string) {
   );
 }
 
+export function slotDayKey(slotIsoStr: string) {
+  return dayKey(new Date(slotIsoStr));
+}
+
 export function slotFull(tickets: BookableTicket[], slotIsoStr: string) {
   return bookingsInSlot(tickets, slotIsoStr).length >= SLOTS_PER_TIME;
 }

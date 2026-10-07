@@ -16,6 +16,8 @@ export type Ticket = {
   type: "appointment" | "walk-in";
   serviceId: ServiceId;
   patientName: string;
+  /** Dummy IC for demo only */
+  ic?: string;
   phone?: string;
   status: TicketStatus;
   slotIso?: string;
@@ -45,7 +47,7 @@ export type ClinicAction =
       type: "book";
       serviceId: ServiceId;
       patientName: string;
-      phone?: string;
+      ic: string;
       slotIso: string;
     }
   | { type: "cancel"; ticketId: string }
@@ -175,7 +177,7 @@ function reducer(state: ClinicState, action: ClinicAction): ClinicState {
         type: "appointment",
         serviceId: action.serviceId,
         patientName: action.patientName.trim(),
-        phone: action.phone?.trim() || undefined,
+        ic: action.ic.trim(),
         status: "booked",
         slotIso: action.slotIso,
         createdAt: new Date().toISOString(),

@@ -1,43 +1,62 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CLINIC_NAME, ROOMS, SERVICES, type ServiceId } from "./constants";
-import { DemoBadge } from "./ClinicShell";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SERVICES, type ServiceId } from "./constants";
+import { ClinicRoleChrome } from "./ClinicRoleChrome";
 import { clinicStats, dispatchClinic } from "./queue-store";
 import { useClinicStore } from "./useClinicStore";
-import { formatSlotTime } from "./scheduling";
+import { formatDayLabel, formatSlotTime, slotDayKey, upcomingClinicDayKeys } from "./scheduling";
 import { statusClass, statusLabel } from "./status-ui";
 
-type Tab = "booked" | "waiting" | "active" | "done";
+type Tab = "booked" | "waiting" | "active" | "done" | "noshow";
 
 export function StaffClient() {
   const state = useClinicStore();
   const [tab, setTab] = useState<Tab>("booked");
+  const [arrivalDay, setArrivalDay] = useState(() => upcomingClinicDayKeys()[0]);
   const [walkName, setWalkName] = useState("");
   const [walkService, setWalkService] = useState<ServiceId>("general");
 
+  const days = useMemo(() => upcomingClinicDayKeys(), []);
   const stats = useMemo(() => clinicStats(state), [state]);
+  const arrivalDayIndex = days.indexOf(arrivalDay);
+  const canPrevDay = arrivalDayIndex > 0;
+  const canNextDay = arrivalDayIndex >= 0 && arrivalDayIndex < days.length - 1;
+
+  const shiftArrivalDay = (delta: -1 | 1) => {
+    const i = days.indexOf(arrivalDay);
+    const next = days[i + delta];
+    if (next) setArrivalDay(next);
+  };
 
   const lists = useMemo(() => {
-    const booked = state.tickets.filter((t) => t.status === "booked");
+    const arrivals = state.tickets.filter(
+      (t) =>
+        t.type === "appointment" &&
+        t.status === "booked" &&
+        t.slotIso &&
+        slotDayKey(t.slotIso) === arrivalDay,
+    );
     const waiting = state.tickets.filter((t) => t.status === "waiting");
     const active = state.tickets.filter(
       (t) => t.status === "called" || t.status === "in-consultation",
     );
-    const done = state.tickets.filter(
-      (t) => t.status === "done" || t.status === "no-show" || t.status === "cancelled",
-    );
-    return { booked, waiting, active, done };
-  }, [state.tickets]);
+    const done = state.tickets.filter((t) => t.status === "done" || t.status === "cancelled");
+    const noshow = state.tickets.filter((t) => t.status === "no-show");
+    return { arrivals, waiting, active, done, noshow };
+  }, [state.tickets, arrivalDay]);
 
   const currentList =
     tab === "booked"
-      ? lists.booked
+      ? lists.arrivals
       : tab === "waiting"
         ? lists.waiting
         : tab === "active"
           ? lists.active
-          : lists.done;
+          : tab === "noshow"
+            ? lists.noshow
+            : lists.done;
 
   const addWalkIn = () => {
     if (!walkName.trim()) return;
@@ -51,103 +70,45 @@ export function StaffClient() {
   };
 
   return (
-    <div className="clinic-demo-root mx-auto max-w-4xl flex-1 px-4 py-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-lg font-semibold">{CLINIC_NAME} · Staff</h2>
-        <DemoBadge />
-      </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        In a real system this screen is behind staff login.
-      </p>
-
-      <div className="mt-4 grid grid-cols-3 gap-2 rounded-xl border border-border bg-card p-3 text-center text-xs sm:text-sm">
-        <div>
-          <p className="font-mono text-lg font-semibold tabular-nums">{stats.waiting}</p>
-          <p className="text-muted-foreground">Waiting now</p>
-        </div>
-        <div>
-          <p className="font-mono text-lg font-semibold tabular-nums">{stats.served}</p>
-          <p className="text-muted-foreground">Served today</p>
-        </div>
-        <div>
-          <p className="font-mono text-lg font-semibold tabular-nums">{stats.avgWait}</p>
-          <p className="text-muted-foreground">Avg wait (min)</p>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div>
-          <h3 className="text-sm font-medium">Rooms</h3>
-          <div className="mt-2 space-y-3">
-            {ROOMS.map((room) => {
-              const curId = state.roomState[room.id].currentTicketId;
-              const cur = curId ? state.tickets.find((t) => t.id === curId) : undefined;
-              return (
-                <div key={room.id} className="rounded-xl border border-border bg-card p-4">
-                  <p className="font-medium">{room.label}</p>
-                  <p className="text-xs text-muted-foreground">{room.doctor}</p>
-                  {cur ? (
-                    <p className="mt-2 font-mono text-sm">
-                      {cur.queueNumber} · {cur.patientName}
-                    </p>
-                  ) : (
-                    <p className="mt-2 text-sm text-muted-foreground">Room free</p>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground"
-                      onClick={() => dispatchClinic({ type: "callNext", roomId: room.id })}
-                    >
-                      Call next
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-lg border border-border px-3 py-1.5 text-xs"
-                      onClick={() => dispatchClinic({ type: "recall", roomId: room.id })}
-                    >
-                      Recall
-                    </button>
-                    {cur ? (
-                      <>
-                        <button
-                          type="button"
-                          className="rounded-lg border border-border px-3 py-1.5 text-xs"
-                          onClick={() => dispatchClinic({ type: "finish", ticketId: cur.id })}
-                        >
-                          Finish
-                        </button>
-                        <button
-                          type="button"
-                          className="rounded-lg border border-red-400/50 px-3 py-1.5 text-xs text-red-600 dark:text-red-400"
-                          onClick={() => dispatchClinic({ type: "noShow", ticketId: cur.id })}
-                        >
-                          No-show
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
-              );
-            })}
+    <ClinicRoleChrome role="staff" wide>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[
+          { label: "Waiting now", value: stats.waiting },
+          { label: "Served today", value: stats.served },
+          { label: "Avg wait (min)", value: stats.avgWait },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card to-band/50 p-4 text-center shadow-sm"
+          >
+            <p className="font-mono text-2xl font-semibold tabular-nums text-foreground">
+              {s.value}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div>
-          <div className="flex flex-wrap gap-1">
+      <div className="mt-8 grid gap-8 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <p className="font-mono text-xs text-accent">Queue</p>
+          <div className="mt-3 flex flex-wrap gap-2">
             {(
               [
-                ["booked", "Booked"],
+                ["booked", "Online arrivals"],
                 ["waiting", "Waiting"],
-                ["active", "In consultation"],
-                ["done", "Done / No-show"],
+                ["active", "With doctor"],
+                ["done", "Done"],
+                ["noshow", "No-show"],
               ] as const
             ).map(([id, label]) => (
               <button
                 key={id}
                 type="button"
-                className={`rounded-lg px-2 py-1 text-xs ${
-                  tab === id ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                className={`rounded-xl border px-3 py-1.5 text-xs font-medium shadow-sm ${
+                  tab === id
+                    ? "border-accent/40 bg-accent text-accent-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-accent/40"
                 }`}
                 onClick={() => setTab(id)}
               >
@@ -156,60 +117,111 @@ export function StaffClient() {
             ))}
           </div>
 
-          <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto">
+          {tab === "booked" ? (
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+              <div
+                className="inline-flex w-fit max-w-full items-stretch overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+                role="group"
+                aria-label="Appointment date"
+              >
+                <button
+                  type="button"
+                  className="inline-flex w-9 shrink-0 items-center justify-center text-foreground hover:bg-band disabled:opacity-40"
+                  disabled={!canPrevDay}
+                  aria-label="Previous day"
+                  onClick={() => shiftArrivalDay(-1)}
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden />
+                </button>
+                <span
+                  className="flex min-w-0 items-center justify-center border-x border-border px-3 py-2 text-center text-xs font-medium text-foreground sm:min-w-[11rem] sm:text-sm"
+                >
+                  {formatDayLabel(arrivalDay)}
+                </span>
+                <button
+                  type="button"
+                  className="inline-flex w-9 shrink-0 items-center justify-center text-foreground hover:bg-band disabled:opacity-40"
+                  disabled={!canNextDay}
+                  aria-label="Next day"
+                  onClick={() => shiftArrivalDay(1)}
+                >
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          <ul className="mt-4 max-h-[28rem] space-y-2 overflow-y-auto">
             {currentList.length === 0 ? (
-              <li className="text-sm text-muted-foreground">No patients in this list.</li>
+              <li className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                {tab === "booked"
+                  ? "No online bookings waiting for check-in on this date."
+                  : "No patients in this list."}
+              </li>
             ) : (
               currentList.map((t) => {
                 const service = SERVICES.find((s) => s.id === t.serviceId)?.label;
                 return (
                   <li
                     key={t.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3 text-sm"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm"
                   >
                     <div>
-                      <p className="font-medium">{t.patientName}</p>
+                      <p className="font-medium text-foreground">{t.patientName}</p>
+                      {t.ic ? (
+                        <p className="font-mono text-[10px] text-muted-foreground">IC {t.ic}</p>
+                      ) : null}
                       <p className="text-xs text-muted-foreground">
                         {service}
-                        {t.slotIso ? ` · ${formatSlotTime(t.slotIso)}` : ""}
+                        {t.slotIso
+                          ? ` · ${formatDayLabel(slotDayKey(t.slotIso))} ${formatSlotTime(t.slotIso)}`
+                          : ""}
                         {t.queueNumber ? ` · ${t.queueNumber}` : ""}
                       </p>
-                      <p className={`text-xs ${statusClass(t.status)}`}>{statusLabel[t.status]}</p>
+                      <p className={`mt-1 text-xs font-medium ${statusClass(t.status)}`}>
+                        {statusLabel[t.status]}
+                      </p>
                     </div>
                     {t.status === "booked" ? (
-                      <button
-                        type="button"
-                        className="rounded-lg border border-border px-2 py-1 text-xs"
-                        onClick={() => dispatchClinic({ type: "checkIn", ticketId: t.id })}
-                      >
-                        Check in
-                      </button>
-                    ) : null}
-                    {t.status === "waiting" ? (
-                      <button
-                        type="button"
-                        className="rounded-lg border border-red-400/50 px-2 py-1 text-xs text-red-600"
-                        onClick={() => dispatchClinic({ type: "noShow", ticketId: t.id })}
-                      >
-                        No-show
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className="rounded-xl bg-accent px-4 py-2 text-xs font-medium text-accent-foreground shadow-sm"
+                          onClick={() => dispatchClinic({ type: "checkIn", ticketId: t.id })}
+                        >
+                          Check in
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-xl border border-red-400/50 bg-card px-3 py-2 text-xs font-medium text-red-600 shadow-sm dark:text-red-400"
+                          onClick={() => dispatchClinic({ type: "noShow", ticketId: t.id })}
+                        >
+                          No-show
+                        </button>
+                      </div>
                     ) : null}
                   </li>
                 );
               })
             )}
           </ul>
+        </div>
 
-          <div className="mt-4 rounded-xl border border-border bg-card p-4">
-            <p className="text-sm font-medium">Add walk-in</p>
+        <div className="lg:col-span-2">
+          <div className="rounded-2xl border border-border bg-card bg-gradient-to-br from-slate-500/5 to-card p-5 shadow-sm">
+            <p className="font-mono text-xs text-accent">Walk-in</p>
+            <h3 className="mt-1 text-base font-semibold text-foreground">Register at counter</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Walk-ins skip booking and go straight into the waiting queue.
+            </p>
             <input
-              className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              className="mt-4 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm shadow-sm"
               placeholder="Patient name"
               value={walkName}
               onChange={(e) => setWalkName(e.target.value)}
             />
             <select
-              className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm shadow-sm"
               value={walkService}
               onChange={(e) => setWalkService(e.target.value as ServiceId)}
             >
@@ -221,7 +233,7 @@ export function StaffClient() {
             </select>
             <button
               type="button"
-              className="mt-2 w-full rounded-lg bg-accent py-2 text-sm font-medium text-accent-foreground"
+              className="mt-3 w-full rounded-xl bg-accent py-2.5 text-sm font-medium text-accent-foreground shadow-sm"
               onClick={addWalkIn}
             >
               Add to queue
@@ -229,6 +241,6 @@ export function StaffClient() {
           </div>
         </div>
       </div>
-    </div>
+    </ClinicRoleChrome>
   );
 }
