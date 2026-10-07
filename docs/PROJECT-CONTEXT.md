@@ -88,6 +88,6 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 ## Roadmap
 
 1. Website content and layout, SEO and link preview, layout switcher hidden (done)
-2. Build side project demos, starting with the GIS map (now)
+2. Build side project demos, starting with the GIS map (now). Full spec: `docs/GIS-DEMO-SPEC.md`
 3. Add redacted screenshots
 4. PDF resume, custom domain

@@ -39,7 +39,7 @@ Hero → About me → Work experience → Education → Side projects → Skills
 ## Roadmap (owner wants the website finished first)
 
 1. ~~Website content, layout, switcher hidden, SEO + link preview, LinkedIn, analytics~~ (done)
-2. Side project demos, starting with the GIS map at `/demos/gis-map` (current phase)
+2. Side project demos, starting with the GIS map at `/demos/gis-map` (current phase). Spec: `docs/GIS-DEMO-SPEC.md`
 3. Screenshots via `image` in `side-projects.ts` + files in `public/projects/` (redact sensitive data)
 4. PDF resume, custom domain
 
