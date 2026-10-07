@@ -200,7 +200,10 @@ export function KnowMeSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionLabel>{knowMe.heading}</SectionLabel>
         <p className="mt-4 max-w-2xl text-base text-muted-foreground">{knowMe.intro}</p>
-        <dl className="mt-8 grid gap-4 sm:grid-cols-2">
+        <blockquote className="mt-8 max-w-3xl border-l-2 border-accent pl-5 text-lg leading-relaxed text-foreground sm:text-xl">
+          {knowMe.thinking}
+        </blockquote>
+        <dl className="mt-10 grid gap-4 sm:grid-cols-2">
           {knowMe.facts.map((f) => (
             <div
               key={f.label}
@@ -212,13 +215,6 @@ export function KnowMeSection() {
             </div>
           ))}
         </dl>
-        {knowMe.interests.length > 0 ? (
-          <div className="mt-8 flex flex-wrap gap-2">
-            {knowMe.interests.map((i) => (
-              <Chip key={i}>{i}</Chip>
-            ))}
-          </div>
-        ) : null}
       </div>
     </section>
   );

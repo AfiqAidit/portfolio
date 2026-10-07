@@ -1,7 +1,12 @@
 export const knowMe = {
   heading: "Know me better",
   intro: "Enough about work and code. Here's a bit about me outside the job.",
+  /** Shown as a larger statement above the fact cards */
+  thinking:
+    "I try to stay open to other solutions and points of view, and I enjoy a good debate over the pros and cons to find out which option is actually better.",
   facts: [
+    { label: "Games", value: "Dota 2, Stardew Valley, and Mobile Legends" },
+    { label: "Sports", value: "Badminton" },
     { label: "Based in", value: "Hulu Langat, Selangor" },
     { label: "Languages", value: "Malay (native) and English (professional)" },
     {
@@ -15,6 +20,4 @@ export const knowMe = {
         "Active member of UKM's Programming Club (SIG). I enjoy working with people face to face.",
     },
   ],
-  /** Hobbies and interests; the list is hidden on the site while empty */
-  interests: [] as string[],
 };

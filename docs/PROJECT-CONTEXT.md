@@ -48,15 +48,21 @@ All text is in `src/content/`:
 
 ## Writing personal content with another AI
 
-The "Know me better" section currently has only facts the owner has confirmed (location, languages, school leadership roles, UKM programming club). Hobbies/interests are empty and hidden until filled.
+"Know me better" contains only what the owner has confirmed:
 
-When helping write it: ask the owner questions, use only what they tell you, keep each item short (one sentence), friendly, and professional enough for recruiters. Output in this shape so it can be pasted into `personal.ts`:
+- **How he thinks:** stays open to other solutions and views, enjoys debating pros and cons to find the better option
+- **Games:** Dota 2, Stardew Valley, Mobile Legends
+- **Sports:** badminton
+- Location, languages, school leadership roles, UKM programming club
+- **Not included on purpose:** travel (he doesn't travel much)
+
+When helping write more: ask the owner questions, use only what they tell you, keep each item short (one sentence), friendly, and professional enough for recruiters. Output in this shape so it can be pasted into `personal.ts`:
 
 ```ts
+thinking: "One or two sentences about how he thinks or works with people.",
 facts: [
   { label: "Short label", value: "One sentence." },
 ],
-interests: ["Hobby one", "Hobby two"],
 ```
 
 ## Design rules
