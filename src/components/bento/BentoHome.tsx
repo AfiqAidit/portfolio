@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { profile } from "@/content/profile";
-import { featuredWork } from "@/content/featured-work";
+import { sideProjects } from "@/content/side-projects";
+import { SideProjectCard } from "@/components/shared/SideProjectCard";
 import { education, universityProjects } from "@/content/education";
 import { experience } from "@/content/experience";
 import { ContactEmail } from "@/components/shared/SiteNav";
@@ -53,20 +54,17 @@ export function BentoHome() {
             <ContactEmail />
           </motion.div>
 
-          {featuredWork.slice(0, 4).map((p, i) => (
+          {sideProjects.map((p, i) => (
             <motion.div
               key={p.id}
+              id={i === 0 ? "projects" : undefined}
               custom={i + 2}
               initial="hidden"
               animate="show"
               variants={fadeUp}
-              className={`rounded-3xl border border-border bg-gradient-to-br ${p.accent} p-6 ${
-                i === 0 ? "sm:col-span-8" : "sm:col-span-4"
-              }`}
+              className={sideProjects.length > 1 ? "sm:col-span-6" : "sm:col-span-12"}
             >
-              <p className="text-xs text-muted">{p.company}</p>
-              <h3 className="mt-2 text-lg font-medium text-foreground">{p.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{p.blurb}</p>
+              <SideProjectCard project={p} className="h-full rounded-3xl" />
             </motion.div>
           ))}
 
@@ -75,7 +73,7 @@ export function BentoHome() {
             initial="hidden"
             animate="show"
             variants={fadeUp}
-            id="work"
+            id="experience"
             className="rounded-3xl border border-border p-8 sm:col-span-12"
             style={{ backgroundColor: "var(--card-muted)" }}
           >
@@ -92,9 +90,7 @@ export function BentoHome() {
                     </h3>
                     <span className="text-sm text-muted">{job.period}</span>
                   </div>
-                  <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-                    {job.highlights[0]?.text}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{job.summary}</p>
                 </div>
               ))}
             </div>

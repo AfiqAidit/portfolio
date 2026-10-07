@@ -19,9 +19,9 @@ alwaysApply: false
 
 ## Layout patterns
 
-- **Motion page:** vertical narrative — hero → featured grid → experience → university → education → skills → footer
-- **Bento pattern (partial):** 12-column grid, `rounded-3xl` cards, varied `col-span` for featured projects only
-- Do not put full job history in a single bento cell with `line-clamp` in production
+- **Motion page:** vertical narrative — hero → about → experience → education → side projects → skills → know me → footer
+- **Bento pattern (archive):** 12-column grid, `rounded-3xl` cards, varied `col-span`
+- Section ids used by nav: `about`, `experience`, `education`, `projects`, `skills`, `know-me`
 
 ## Motion & a11y
 
@@ -32,5 +32,5 @@ alwaysApply: false
 
 ## Components
 
-- Shared chrome: `StyleNav`, `SiteFooter`, `ContactEmail` in `components/shared/`
+- Shared chrome: `SiteNav`, `SiteFooter`, `ContactEmail` in `components/shared/`
 - Section blocks: `components/shared/sections.tsx` — reuse before forking layouts

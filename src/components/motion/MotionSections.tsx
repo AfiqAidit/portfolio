@@ -4,20 +4,22 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { profile } from "@/content/profile";
-import { featuredWork, featuredWorkIntro } from "@/content/featured-work";
-import { FeaturedWorkCard } from "@/components/shared/FeaturedWorkCard";
+import { sideProjects } from "@/content/side-projects";
 import { ContactEmail } from "@/components/shared/SiteNav";
+import { SideProjectCard } from "@/components/shared/SideProjectCard";
+import { SideProjectsHeader } from "@/components/shared/sections";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const bentoSpans = ["sm:col-span-7", "sm:col-span-5", "sm:col-span-5", "sm:col-span-7"];
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 export function MotionHero() {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
       gsap.from(".motion-line", {
@@ -57,18 +59,15 @@ export function MotionHero() {
         <h1 className="motion-line mt-8 text-5xl font-semibold tracking-tight text-foreground sm:text-7xl">
           {profile.shortName}
         </h1>
-        <p className="motion-line mt-4 max-w-xl text-lg text-muted-foreground">
-          {profile.location}
+        <p className="motion-line mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+          {profile.tagline}
         </p>
-        <p className="motion-line mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          {profile.summary}
-        </p>
-        <div className="motion-line mt-10 flex flex-wrap gap-4">
+        <div className="motion-line mt-10 flex flex-wrap items-center gap-4">
           <a
-            href="#projects"
+            href="#experience"
             className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-[#0a0a0a] hover:opacity-90 dark:text-[#050505]"
           >
-            Explore work
+            View experience
           </a>
           <ContactEmail />
         </div>
@@ -77,20 +76,16 @@ export function MotionHero() {
   );
 }
 
-export function MotionFeaturedBento() {
-  const grid = useRef<HTMLDivElement>(null);
+export function MotionSideProjects() {
+  const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    if (prefersReducedMotion()) return;
 
     const ctx = gsap.context(() => {
       gsap.utils.toArray<HTMLElement>(".motion-card").forEach((card, i) => {
         gsap.from(card, {
-          scrollTrigger: {
-            trigger: card,
-            start: "top 85%",
-          },
+          scrollTrigger: { trigger: card, start: "top 85%" },
           y: 40,
           opacity: 0,
           duration: 0.6,
@@ -98,32 +93,20 @@ export function MotionFeaturedBento() {
           ease: "power2.out",
         });
       });
-    }, grid);
+    }, root);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section id="projects" ref={grid} className="py-16 sm:py-20">
+    <section id="projects" ref={root} className="border-t border-border py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="text-xs uppercase tracking-[0.2em] text-muted">
-          {featuredWorkIntro.heading}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          {featuredWorkIntro.subheading}
-        </p>
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-12">
-          {featuredWork.map((p, i) => (
-            <FeaturedWorkCard
-              key={p.id}
-              project={p}
-              className={`motion-card ${bentoSpans[i] ?? "sm:col-span-6"}`}
-            />
+        <SideProjectsHeader />
+        <div className={`mt-8 grid gap-4 ${sideProjects.length > 1 ? "sm:grid-cols-2" : ""}`}>
+          {sideProjects.map((p) => (
+            <SideProjectCard key={p.id} project={p} className="motion-card" />
           ))}
         </div>
       </div>
     </section>
   );
 }
-
-/** @deprecated Use MotionFeaturedBento */
-export const MotionProjectCards = MotionFeaturedBento;

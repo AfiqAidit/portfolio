@@ -3,6 +3,10 @@ export type ExperienceRole = {
   title: string;
   period: string;
   note?: string;
+  /** One-line overview shown on the portfolio */
+  summary: string;
+  stack: string[];
+  /** Detailed bullets shown on /resume */
   highlights: { label?: string; text: string }[];
 };
 
@@ -11,6 +15,9 @@ export const experience: ExperienceRole[] = [
     company: "Selangkah Ventures Sdn Bhd",
     title: "Full Stack Developer",
     period: "August 2025 — Present",
+    summary:
+      "Build and maintain the Spring Boot backends behind the Selangkah mobile app, plus clinic and dental management systems, an insurance platform backend, and a hospital website.",
+    stack: ["Java", "Spring Boot", "Laravel", "NestJS", "Next.js", "MySQL"],
     highlights: [
       {
         label: "Selangkah Plus",
@@ -46,6 +53,9 @@ export const experience: ExperienceRole[] = [
     company: "Puncak Tegap Sdn Bhd",
     title: "GIS Developer / Full Stack Developer",
     period: "November 2024 — August 2025",
+    summary:
+      "Built and maintained GIS web applications for Malaysia's land administration system, from the map frontend to the geospatial database and deployment.",
+    stack: ["JavaScript", "Leaflet", "OpenLayers", "C#", "PostgreSQL", "GeoServer"],
     highlights: [
       {
         label: "eTanah",
@@ -65,6 +75,9 @@ export const experience: ExperienceRole[] = [
     title: "Back-end Developer",
     period: "February 2024 — May 2024",
     note: "Short-term project contract",
+    summary:
+      "Built project monitoring software that checks whether a project is on track to finish by its deadline.",
+    stack: ["Java", "JDBC", "MySQL"],
     highlights: [
       {
         text: "Project monitoring and Sakit Detection features in Java, JDBC, MySQL — Figma wireframes, probability graph, detection algorithm, licensing integration.",
@@ -75,6 +88,9 @@ export const experience: ExperienceRole[] = [
     company: "Finexus International Sdn Bhd",
     title: "Back-end Developer (Internship)",
     period: "September 2023 — January 2024",
+    summary:
+      "Worked on a card management system for banks — API enhancements, performance testing, and data encryption.",
+    stack: ["Java", "SQL", "Jaspersoft"],
     highlights: [
       {
         label: "CARDWORKS",

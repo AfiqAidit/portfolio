@@ -4,8 +4,10 @@ import { ThemeToggle } from "./ThemeToggle";
 import { LayoutStyleSwitcher } from "./LayoutStyleSwitcher";
 
 const navLinks = [
-  { href: "#projects", label: "Work" },
-  { href: "#work", label: "Experience" },
+  { href: "#about", label: "About" },
+  { href: "#experience", label: "Experience" },
+  { href: "#projects", label: "Projects" },
+  { href: "#know-me", label: "Know me" },
   { href: "/resume", label: "Resume" },
 ];
 
