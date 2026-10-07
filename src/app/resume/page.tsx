@@ -75,7 +75,7 @@ export default function ResumePage() {
           <h2 className="border-b border-[#222] pb-1 text-xs font-bold uppercase tracking-wider">
             Education
           </h2>
-          {education.map((e) => (
+          {education.filter((e) => e.showOnResume !== false).map((e) => (
             <div key={e.school} className="mt-3">
               <div className="flex flex-wrap justify-between gap-2 text-sm font-bold">
                 <span>

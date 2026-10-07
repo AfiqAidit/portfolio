@@ -6,6 +6,8 @@ export type ExperienceRole = {
   /** One-line overview shown on the portfolio */
   summary: string;
   stack: string[];
+  /** Other tools used in this role; only feeds the "where I used it" hover in Skills */
+  alsoUsed?: string[];
   /** Detailed bullets shown on /resume */
   highlights: { label?: string; text: string }[];
 };
@@ -18,6 +20,7 @@ export const experience: ExperienceRole[] = [
     summary:
       "Build and maintain the Spring Boot backends behind the Selangkah mobile app, plus clinic and dental management systems, an insurance platform backend, and a hospital website.",
     stack: ["Java", "Spring Boot", "Laravel", "NestJS", "Next.js", "MySQL"],
+    alsoUsed: ["HTML", "CSS", "Maven", "Eclipse", "GitLab"],
     highlights: [
       {
         label: "Selangkah Plus",
@@ -56,6 +59,7 @@ export const experience: ExperienceRole[] = [
     summary:
       "Built and maintained GIS web applications for Malaysia's land administration system, from the map frontend to the geospatial database and deployment.",
     stack: ["JavaScript", "Leaflet", "OpenLayers", "C#", "PostgreSQL", "GeoServer"],
+    alsoUsed: ["HTML", "CSS", "Python"],
     highlights: [
       {
         label: "eTanah",
@@ -78,6 +82,7 @@ export const experience: ExperienceRole[] = [
     summary:
       "Built project monitoring software that checks whether a project is on track to finish by its deadline.",
     stack: ["Java", "JDBC", "MySQL"],
+    alsoUsed: ["NetBeans"],
     highlights: [
       {
         text: "Built project monitoring and Sakit Detection features in Java, JDBC, and MySQL from Figma wireframes, including a probability graph, the detection algorithm, and license key integration.",
@@ -91,6 +96,7 @@ export const experience: ExperienceRole[] = [
     summary:
       "Worked on a card management system for banks: API enhancements, performance testing, and data encryption.",
     stack: ["Java", "SQL", "Jaspersoft"],
+    alsoUsed: ["DBeaver", "Maven", "Eclipse"],
     highlights: [
       {
         label: "CARDWORKS",

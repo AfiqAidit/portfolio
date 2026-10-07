@@ -1,4 +1,14 @@
-export const education = [
+export type EducationEntry = {
+  school: string;
+  degree: string;
+  period: string;
+  result: { label: string; value: string };
+  bullets: string[];
+  /** Defaults to true; secondary school stays on the website only. */
+  showOnResume?: boolean;
+};
+
+export const education: EducationEntry[] = [
   {
     school: "Universiti Kebangsaan Malaysia (UKM)",
     degree: "Bachelor of Computer Science (Hons)",
@@ -14,7 +24,15 @@ export const education = [
     degree: "Foundation in Engineering",
     period: "2019 - 2020",
     result: { label: "CGPA", value: "4.00" },
-    bullets: [] as string[],
+    bullets: [],
+  },
+  {
+    school: "SMK Jalan Tiga, Bandar Baru Bangi",
+    degree: "Sijil Pelajaran Malaysia (SPM)",
+    period: "2014 - 2018",
+    result: { label: "SPM", value: "8A 2B" },
+    bullets: [],
+    showOnResume: false,
   },
 ];
 

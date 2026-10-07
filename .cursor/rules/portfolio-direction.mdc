@@ -42,7 +42,8 @@ Hero → About me → Work experience → Education → Side projects → Skills
 2. Side project demos, starting with the GIS map at `/demos/gis-map` (current phase)
 3. Screenshots via `image` in `side-projects.ts` + files in `public/projects/` (redact sensitive data)
 4. PDF resume, custom domain
-5. Pending content from owner: secondary school name + years (SPM 8A 2B, website only, not `/resume`); which jobs used HTML, CSS, Python, Maven, GitLab, Eclipse, NetBeans, DBeaver
+
+Notes: SPM card uses `showOnResume: false` (website only). Tools not named in job text go in `alsoUsed` on each role in `experience.ts` (feeds the Skills hover only, not the resume)
 
 ## Deploy
 

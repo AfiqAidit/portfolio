@@ -16,7 +16,9 @@ function companiesUsing(skill: string) {
   const word = new RegExp(`(?<![\\w])(${terms.map(escapeRegExp).join("|")})(?![\\w])`, "i");
   return experience
     .filter(
-      (job) => job.stack.some((s) => word.test(s)) || job.highlights.some((h) => word.test(h.text)),
+      (job) =>
+        [...job.stack, ...(job.alsoUsed ?? [])].some((s) => word.test(s)) ||
+        job.highlights.some((h) => word.test(h.text)),
     )
     .map((job) => job.company.replace(/\s+Sdn Bhd$/, ""));
 }

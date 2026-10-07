@@ -19,7 +19,7 @@ function TimelineItem({
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: lineRef,
-    offset: ["start 30%", "end 30%"],
+    offset: ["start 35%", "end 35%"],
   });
   const current = job.period.endsWith("Present");
   const lineSpan = `${first ? "top-8" : "top-0"} ${last ? "h-8" : "bottom-0"}`;
@@ -49,7 +49,7 @@ function TimelineItem({
           aria-hidden
           initial={{ scale: 0 }}
           whileInView={{ scale: 1 }}
-          viewport={{ margin: "0px 0px -70% 0px" }}
+          viewport={{ margin: "0px 0px -65% 0px" }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
           className="absolute -left-1.5 top-7 z-10 h-3 w-3 rounded-full border-2 border-accent bg-background shadow-[0_0_12px_var(--accent)]"
         />
