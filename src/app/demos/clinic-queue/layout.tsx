@@ -28,7 +28,7 @@ export default function ClinicQueueLayout({ children }: { children: React.ReactN
         </div>
       </header>
       <ClinicDemoLayoutClient />
-      {children}
+      <div className="flex min-h-0 flex-1 flex-col">{children}</div>
     </div>
   );
 }
