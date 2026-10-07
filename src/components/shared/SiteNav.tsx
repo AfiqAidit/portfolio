@@ -4,6 +4,7 @@ import { profile } from "@/content/profile";
 import { ThemeToggle } from "./ThemeToggle";
 import { LayoutStyleSwitcher } from "./LayoutStyleSwitcher";
 import { MobileMenu } from "./MobileMenu";
+import { GlowBackdrop } from "./GlowBackdrop";
 
 const navLinks = [
   { href: "#about", label: "About" },
@@ -59,8 +60,9 @@ export function ContactEmail() {
 
 export function SiteFooter() {
   return (
-    <footer id="contact" className="scroll-mt-28 border-t border-border">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+    <footer id="contact" className="group relative scroll-mt-28 overflow-hidden border-t border-border">
+      <GlowBackdrop placement="bottom" />
+      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
         <p className="font-mono text-xs text-accent">07</p>
         <h2 className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
           Get in touch
@@ -79,7 +81,7 @@ export function SiteFooter() {
           />
         </a>
       </div>
-      <div className="border-t border-border">
+      <div className="relative border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-6 text-xs text-muted sm:px-6">
           <p>
             © {new Date().getFullYear()} {profile.shortName}

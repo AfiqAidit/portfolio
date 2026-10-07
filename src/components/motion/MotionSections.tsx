@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { profile } from "@/content/profile";
-import { trackPointer } from "@/components/shared/Spotlight";
+import { GlowBackdrop } from "@/components/shared/GlowBackdrop";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -58,18 +58,8 @@ export function MotionHero() {
   }, []);
 
   return (
-    <section
-      ref={root}
-      onPointerMove={trackPointer}
-      className="group relative overflow-hidden border-b border-border"
-    >
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="bg-dot-grid absolute inset-0" />
-        <div className="hero-cursor-glow absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="bg-dot-grid-lit absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <div className="animate-drift absolute -left-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-accent/20 blur-3xl" />
-        <div className="animate-drift-slow absolute -bottom-48 -right-40 h-[30rem] w-[30rem] rounded-full bg-accent-2/15 blur-3xl" />
-      </div>
+    <section ref={root} className="group relative overflow-hidden border-b border-border">
+      <GlowBackdrop />
 
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28">
         <p className="motion-line flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">

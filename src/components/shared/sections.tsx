@@ -47,15 +47,21 @@ function SectionHeader({
   description?: string;
 }) {
   return (
-    <Reveal className="max-w-2xl">
-      <p className="font-mono text-xs text-accent">{index}</p>
-      <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-        {title}
-      </h2>
-      {description ? (
-        <p className="mt-3 text-base leading-relaxed text-muted-foreground">{description}</p>
-      ) : null}
-    </Reveal>
+    <div className="relative">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-10 left-0 h-36 w-80 max-w-full rounded-full bg-accent/10 blur-3xl"
+      />
+      <Reveal className="relative max-w-2xl">
+        <p className="font-mono text-xs text-accent">{index}</p>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+          {title}
+        </h2>
+        {description ? (
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">{description}</p>
+        ) : null}
+      </Reveal>
+    </div>
   );
 }
 
