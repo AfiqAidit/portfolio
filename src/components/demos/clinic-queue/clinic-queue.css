@@ -1,5 +1,11 @@
+/* Scoped tokens so the clinic demo has a bit more depth than flat gray */
+.clinic-demo-root {
+  --clinic-surface: color-mix(in srgb, var(--accent) 4%, var(--card));
+}
+
 .dark .clinic-demo-root {
-  --card: #18181b;
-  --background: #0f0f11;
-  --border: rgb(255 255 255 / 0.14);
+  --card: color-mix(in srgb, var(--accent) 8%, rgb(18 22 30));
+  --background: color-mix(in srgb, var(--accent) 6%, #08090c);
+  --border: color-mix(in srgb, var(--accent) 22%, rgb(255 255 255 / 0.12));
+  --clinic-surface: color-mix(in srgb, var(--accent) 10%, rgb(18 22 30));
 }

@@ -8,7 +8,9 @@ export function segmentBtn(active: boolean) {
 }
 
 export function choiceCard(active: boolean) {
-  return `w-full rounded-2xl border px-4 py-4 text-left shadow-sm transition hover:border-accent/40 ${
-    active ? "border-accent bg-accent/10 ring-1 ring-accent/20" : "border-border bg-card"
+  return `w-full rounded-2xl border px-4 py-4 text-left shadow-sm transition hover:border-accent/50 hover:bg-[var(--clinic-surface)] ${
+    active
+      ? "border-accent bg-accent/15 ring-1 ring-accent/25"
+      : "border-border bg-[var(--clinic-surface)]"
   }`;
 }
