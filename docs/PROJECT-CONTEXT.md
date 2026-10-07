@@ -89,6 +89,6 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 ## Roadmap
 
 1. Website content and layout, SEO and link preview, layout switcher hidden (done)
-2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Next: card API playground inspired by Finexus. Elcorp skipped for now
+2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Next: a Java EE bank card system inspired by Finexus, aimed at Java EE job openings, in its own repo. It doubles as a tutorial through a "Show what's happening" mode that explains each server step. Runs on WildFly with Oracle, hosted on Oracle Cloud Always Free. Full context, decisions, and plan: `docs/CARD-SYSTEM-SPEC.md`. Elcorp skipped for now
 3. Add redacted screenshots
 4. PDF resume, custom domain
