@@ -3,22 +3,27 @@ import Link from "next/link";
 import {
   ArrowRight,
   Award,
+  Briefcase,
+  Code2,
   Feather,
   Gamepad2,
   GraduationCap,
   Languages,
+  Mail,
   MapPin,
   type LucideIcon,
 } from "lucide-react";
 import { profile } from "@/content/profile";
 import { experience } from "@/content/experience";
 import { education, universityProjects } from "@/content/education";
-import { skillGroups } from "@/content/skills";
 import { sideProjects, sideProjectsIntro } from "@/content/side-projects";
 import { knowMe, type KnowMeIcon } from "@/content/personal";
 import { ContactEmail } from "./SiteNav";
 import { SideProjectCard } from "./SideProjectCard";
 import { Reveal } from "./Reveal";
+import { Spotlight } from "./Spotlight";
+import { ExperienceTimeline } from "./ExperienceTimeline";
+import { SkillsExplorer } from "./SkillsExplorer";
 
 const knowMeIcons: Record<KnowMeIcon, LucideIcon> = {
   gamepad: Gamepad2,
@@ -55,14 +60,6 @@ function SectionHeader({
   );
 }
 
-function Chip({ children }: { children: ReactNode }) {
-  return (
-    <span className="rounded-full border border-border bg-background/60 px-2.5 py-1 text-xs text-muted-foreground">
-      {children}
-    </span>
-  );
-}
-
 export function SharedHero({ variant }: { variant: string }) {
   return (
     <section className="border-b border-border py-16 sm:py-20">
@@ -89,16 +86,68 @@ export function SharedHero({ variant }: { variant: string }) {
   );
 }
 
+function shortCompany(company: string) {
+  return company.replace(/\s+Sdn Bhd$/, "");
+}
+
+function AtAGlance() {
+  const current = experience[0];
+  const degree = education[0];
+  const rows = [
+    {
+      icon: Briefcase,
+      label: "Currently",
+      value: `${current.title} at ${shortCompany(current.company)}`,
+    },
+    { icon: MapPin, label: "Based in", value: profile.location },
+    {
+      icon: GraduationCap,
+      label: "Studied",
+      value: `Computer Science, UKM (CGPA ${degree.cgpa})`,
+    },
+    { icon: Code2, label: "Day to day", value: current.stack.slice(0, 4).join(", ") },
+  ];
+
+  return (
+    <Spotlight className="rounded-2xl border border-border bg-card p-6">
+      <p className="font-mono text-xs text-muted">At a glance</p>
+      <ul className="mt-5 space-y-4">
+        {rows.map(({ icon: Icon, label, value }) => (
+          <li key={label} className="flex gap-3">
+            <Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden />
+            <div>
+              <p className="text-xs text-muted">{label}</p>
+              <p className="text-sm text-foreground">{value}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <a
+        href={`mailto:${profile.email}`}
+        className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
+      >
+        <Mail className="h-4 w-4" aria-hidden />
+        {profile.email}
+      </a>
+    </Spotlight>
+  );
+}
+
 export function AboutSection() {
   return (
     <section id="about" className="scroll-mt-28 py-20 sm:py-28">
-      <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
+      <Container>
         <SectionHeader index="01" title="About me" />
-        <Reveal className="space-y-5 text-lg leading-relaxed text-muted-foreground" delay={0.1}>
-          {profile.about.map((p) => (
-            <p key={p}>{p}</p>
-          ))}
-        </Reveal>
+        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-16">
+          <Reveal className="space-y-5 text-lg leading-relaxed text-muted-foreground">
+            {profile.about.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
+          </Reveal>
+          <Reveal delay={0.1}>
+            <AtAGlance />
+          </Reveal>
+        </div>
       </Container>
     </section>
   );
@@ -116,53 +165,7 @@ export function ExperienceSection() {
           title="Work experience"
           description="Where I've worked and what I did there, in short."
         />
-        <ol className="mt-12">
-          {experience.map((job, i) => {
-            const current = job.period.endsWith("Present");
-            const last = i === experience.length - 1;
-            return (
-              <li
-                key={`${job.company}-${job.period}`}
-                className="grid gap-2 sm:grid-cols-[180px_1fr] sm:gap-8"
-              >
-                <p className="font-mono text-xs text-muted sm:pt-7 sm:text-right">{job.period}</p>
-                <div className={`relative border-l border-border pl-6 ${last ? "" : "pb-8"}`}>
-                  <span
-                    aria-hidden
-                    className={`absolute -left-[5px] top-7 h-2.5 w-2.5 rounded-full ring-4 ring-background ${
-                      current ? "bg-accent" : "bg-muted"
-                    }`}
-                  />
-                  <Reveal>
-                    <article className="rounded-2xl border border-border bg-card p-6 transition-colors hover:border-accent/40">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">{job.title}</h3>
-                          <p className="text-sm text-muted-foreground">{job.company}</p>
-                        </div>
-                        {current ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
-                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
-                            Current
-                          </span>
-                        ) : null}
-                      </div>
-                      {job.note ? <p className="mt-1 text-xs italic text-muted">{job.note}</p> : null}
-                      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                        {job.summary}
-                      </p>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {job.stack.map((s) => (
-                          <Chip key={s}>{s}</Chip>
-                        ))}
-                      </div>
-                    </article>
-                  </Reveal>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+        <ExperienceTimeline />
         <Link
           href="/resume"
           className="mt-10 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline sm:ml-[212px]"
@@ -183,7 +186,10 @@ export function EducationSection() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
           {education.map((e, i) => (
             <Reveal key={e.school} delay={i * 0.08} className="h-full">
-              <article className="flex h-full flex-col rounded-2xl border border-border bg-card p-6">
+              <Spotlight
+                as="article"
+                className="flex h-full flex-col rounded-2xl border border-border bg-card p-6"
+              >
                 <p className="font-mono text-xs text-muted">{e.period}</p>
                 <h3 className="mt-3 text-lg font-semibold text-foreground">{e.degree}</h3>
                 <p className="text-sm text-muted-foreground">{e.school}</p>
@@ -200,7 +206,7 @@ export function EducationSection() {
                     ))}
                   </ul>
                 ) : null}
-              </article>
+              </Spotlight>
             </Reveal>
           ))}
         </div>
@@ -208,9 +214,11 @@ export function EducationSection() {
           <h3 className="text-sm font-semibold text-foreground">University & SIG activities</h3>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {universityProjects.map((p) => (
-              <li key={p.name} className="rounded-xl border border-border bg-card p-4">
-                <p className="font-medium text-foreground">{p.name}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+              <li key={p.name}>
+                <Spotlight className="h-full rounded-xl border border-border bg-card p-4">
+                  <p className="font-medium text-foreground">{p.name}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+                </Spotlight>
               </li>
             ))}
           </ul>
@@ -251,20 +259,7 @@ export function SkillsSection() {
     <section id="skills" className="scroll-mt-28 border-t border-border py-20 sm:py-28">
       <Container>
         <SectionHeader index="05" title="Skills" />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {skillGroups.map((g, i) => (
-            <Reveal key={g.label} delay={(i % 3) * 0.06} className="h-full">
-              <div className="h-full rounded-2xl border border-border bg-card p-6">
-                <h3 className="text-sm font-semibold text-foreground">{g.label}</h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {g.items.map((item) => (
-                    <Chip key={item}>{item}</Chip>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <SkillsExplorer />
       </Container>
     </section>
   );
@@ -289,7 +284,7 @@ export function KnowMeSection() {
             return (
               <li key={f.label} className="h-full">
                 <Reveal delay={(i % 3) * 0.06} className="h-full">
-                  <div className="flex h-full gap-4 rounded-2xl border border-border bg-card p-5">
+                  <Spotlight className="flex h-full gap-4 rounded-2xl border border-border bg-card p-5">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
                       <Icon className="h-5 w-5" aria-hidden />
                     </span>
@@ -297,7 +292,7 @@ export function KnowMeSection() {
                       <p className="text-xs uppercase tracking-wider text-muted">{f.label}</p>
                       <p className="mt-1 text-sm text-foreground">{f.value}</p>
                     </div>
-                  </div>
+                  </Spotlight>
                 </Reveal>
               </li>
             );

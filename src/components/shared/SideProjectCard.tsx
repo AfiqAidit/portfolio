@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { SideProject, SideProjectStatus } from "@/content/side-projects";
+import { Spotlight } from "./Spotlight";
 
 const statusLabel: Record<SideProjectStatus, string> = {
   planned: "Planned",
@@ -16,8 +17,9 @@ type Props = {
 
 export function SideProjectCard({ project, className = "" }: Props) {
   return (
-    <article
-      className={`overflow-hidden rounded-2xl border border-border bg-card bg-gradient-to-br ${project.accent} transition-colors hover:border-accent/40 ${className}`}
+    <Spotlight
+      as="article"
+      className={`overflow-hidden rounded-2xl border border-border bg-card bg-gradient-to-br ${project.accent} ${className}`}
     >
       {project.image ? (
         <div className="relative aspect-[16/10] w-full border-b border-border bg-background/30">
@@ -73,6 +75,6 @@ export function SideProjectCard({ project, className = "" }: Props) {
           </Link>
         ) : null}
       </div>
-    </article>
+    </Spotlight>
   );
 }

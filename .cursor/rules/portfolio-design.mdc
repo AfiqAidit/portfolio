@@ -33,7 +33,10 @@ alwaysApply: false
 
 ## Motion & a11y
 
-- One signature moment only: the hero (dot grid, drifting glows, rotating topic word, GSAP entrance). Everything else is a calm `Reveal` fade-up on scroll
+- Intensity: **subtle** (owner's choice). One signature moment: the hero (dot grid that lights up around the cursor, drifting glows, rotating topic word, GSAP entrance)
+- One repeated interaction: `Spotlight` cards (border + surface glow follows the mouse; hover devices only). Use it for every card instead of inventing new hover effects
+- Section-specific: experience timeline line fills on scroll and dots pop in (`ExperienceTimeline`); skills chips show where each skill was used (`SkillsExplorer`, derived from `experience.ts` plus `skillAliases`); About has an "At a glance" panel derived from content
+- Everything else is a calm `Reveal` fade-up on scroll
 - Respect `prefers-reduced-motion`: `MotionConfig reducedMotion="user"`, GSAP and the rotating word skip, CSS drift disabled
 - Rotating text must have an `sr-only` full sentence; decorative layers are `aria-hidden`
 - No ENTER splash gates; no full-page WebGL/Three.js unless explicitly requested

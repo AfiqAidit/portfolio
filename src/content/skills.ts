@@ -41,3 +41,15 @@ export const skillGroups = [
     ],
   },
 ];
+
+/**
+ * Extra words that count as using a skill when matching it against
+ * `experience.ts` (for the "where I used it" hover in Skills).
+ */
+export const skillAliases: Record<string, string[]> = {
+  PHP: ["Laravel"],
+  React: ["Next.js"],
+  "REST APIs": ["REST"],
+  "Laravel Voyager": ["Voyager"],
+  "Jaspersoft Studio": ["Jaspersoft"],
+};

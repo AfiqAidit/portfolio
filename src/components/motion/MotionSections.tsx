@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { profile } from "@/content/profile";
+import { trackPointer } from "@/components/shared/Spotlight";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -57,9 +58,15 @@ export function MotionHero() {
   }, []);
 
   return (
-    <section ref={root} className="relative overflow-hidden border-b border-border">
+    <section
+      ref={root}
+      onPointerMove={trackPointer}
+      className="group relative overflow-hidden border-b border-border"
+    >
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="bg-dot-grid absolute inset-0" />
+        <div className="hero-cursor-glow absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="bg-dot-grid-lit absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         <div className="animate-drift absolute -left-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-accent/20 blur-3xl" />
         <div className="animate-drift-slow absolute -bottom-48 -right-40 h-[30rem] w-[30rem] rounded-full bg-accent-2/15 blur-3xl" />
       </div>
