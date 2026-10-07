@@ -166,7 +166,7 @@ export function ExperienceSection() {
         <ExperienceTimeline />
         <Link
           href="/resume"
-          className="mt-10 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline sm:ml-[212px]"
+          className="mt-10 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline pl-1.5 sm:ml-[200px] sm:pl-0"
         >
           Full details in my resume
           <ArrowRight className="h-4 w-4" aria-hidden />
