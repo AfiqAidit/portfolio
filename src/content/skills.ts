@@ -1,24 +1,43 @@
 export const skillGroups = [
   {
     label: "Languages",
-    items: "Java, SQL, TypeScript, JavaScript, C#, PHP, HTML, CSS, Python",
+    items: ["Java", "SQL", "TypeScript", "JavaScript", "C#", "PHP", "HTML", "CSS", "Python"],
   },
   {
     label: "Backend",
-    items:
-      "Spring Boot, Spring Data JPA, REST APIs, Swagger, NestJS, TypeORM, Laravel, SOAP",
+    items: [
+      "Spring Boot",
+      "Spring Data JPA",
+      "REST APIs",
+      "SOAP",
+      "Swagger",
+      "NestJS",
+      "TypeORM",
+      "Laravel",
+    ],
   },
   {
     label: "Frontend",
-    items: "Next.js, React, Laravel Voyager, OpenLayers, Leaflet",
+    items: ["Next.js", "React", "Laravel Voyager", "OpenLayers", "Leaflet"],
   },
   {
     label: "Databases",
-    items: "MySQL, PostgreSQL",
+    items: ["MySQL", "PostgreSQL"],
   },
   {
     label: "Tools",
-    items:
-      "Maven, Git, GitLab, Redmine, BytePlus, Eclipse, NetBeans, DBeaver, Figma, GeoServer, Jaspersoft Studio",
+    items: [
+      "Maven",
+      "Git",
+      "GitLab",
+      "Redmine",
+      "BytePlus",
+      "Eclipse",
+      "NetBeans",
+      "DBeaver",
+      "Figma",
+      "GeoServer",
+      "Jaspersoft Studio",
+    ],
   },
 ];

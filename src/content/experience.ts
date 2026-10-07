@@ -14,14 +14,14 @@ export const experience: ExperienceRole[] = [
   {
     company: "Selangkah Ventures Sdn Bhd",
     title: "Full Stack Developer",
-    period: "August 2025 — Present",
+    period: "August 2025 - Present",
     summary:
       "Build and maintain the Spring Boot backends behind the Selangkah mobile app, plus clinic and dental management systems, an insurance platform backend, and a hospital website.",
     stack: ["Java", "Spring Boot", "Laravel", "NestJS", "Next.js", "MySQL"],
     highlights: [
       {
         label: "Selangkah Plus",
-        text: "Develop and maintain the revamped Spring Boot backend (Java 21, Spring Data JPA, MySQL) for the Selangkah mobile app; REST endpoints documented with Swagger; contributed most new database work as part of a team.",
+        text: "Develop and maintain the revamped Spring Boot backend (Java 21, Spring Data JPA, MySQL) for the Selangkah mobile app, with REST endpoints documented in Swagger. Contributed most of the new database work as part of a team.",
       },
       {
         label: "Selangkah",
@@ -29,72 +29,72 @@ export const experience: ExperienceRole[] = [
       },
       {
         label: "Integration",
-        text: "Connected SCMS and SDMS to the Selangkah app using IC as the unique identifier — clinic documents, EMR records, and appointment booking flows.",
+        text: "Connected SCMS and SDMS to the Selangkah app using IC as the unique identifier, covering clinic documents, EMR records, and appointment booking.",
       },
       {
         label: "SCMS",
-        text: "Stabilized Selcare Clinic Management System (Laravel, Voyager) after go-live — production fixes, enhancements, digital prescription stickers, MSC Trustgate SOAP signing.",
+        text: "Stabilized the Selcare Clinic Management System (Laravel, Voyager) after go-live with production fixes and enhancements, including digital prescription stickers and MSC Trustgate SOAP signing.",
       },
       {
         label: "SDMS",
-        text: "Built Selcare Dental Management System end to end — requirements, UI/UX, database, deployment, in-dashboard guides, Trustgate signing, Selangkah document delivery.",
+        text: "Built the Selcare Dental Management System end to end: requirements, UI/UX, database, deployment, in-dashboard staff guides, Trustgate signing, and document delivery to the Selangkah app.",
       },
       {
         label: "VSURE",
-        text: "Built insurance platform backend in NestJS, TypeScript, TypeORM, MySQL — plans, claims, nominees.",
+        text: "Built an insurance platform backend in NestJS, TypeScript, TypeORM, and MySQL for plans, claims, and nominees.",
       },
       {
         label: "Selgate website",
-        text: "Next.js hospital site with 360° VR views; deployed on BytePlus via Git.",
+        text: "Built a Next.js hospital website with 360° VR views, deployed on BytePlus via Git.",
       },
     ],
   },
   {
     company: "Puncak Tegap Sdn Bhd",
     title: "GIS Developer / Full Stack Developer",
-    period: "November 2024 — August 2025",
+    period: "November 2024 - August 2025",
     summary:
       "Built and maintained GIS web applications for Malaysia's land administration system, from the map frontend to the geospatial database and deployment.",
     stack: ["JavaScript", "Leaflet", "OpenLayers", "C#", "PostgreSQL", "GeoServer"],
     highlights: [
       {
         label: "eTanah",
-        text: "Revamped and maintained GIS web application for Putrajaya and Labuan on UI and backend.",
+        text: "Revamped and maintained the GIS web application for Putrajaya and Labuan on both UI and backend.",
       },
       {
         label: "GIS",
-        text: "Sole developer: OpenLayers & Leaflet frontend, C# backend, GeoServer, PostgreSQL — first production deployment.",
+        text: "Sole developer of the mapping module: OpenLayers and Leaflet frontend, C# backend, GeoServer, and PostgreSQL, including its first production deployment.",
       },
       {
-        text: "Production support from Redmine, UAT, and user training before go-live.",
+        text: "Production support from Redmine tickets, UAT, and user training before go-live.",
       },
     ],
   },
   {
     company: "Elcorp Technology Sdn Bhd",
     title: "Back-end Developer",
-    period: "February 2024 — May 2024",
+    period: "February 2024 - May 2024",
     note: "Short-term project contract",
     summary:
       "Built project monitoring software that checks whether a project is on track to finish by its deadline.",
     stack: ["Java", "JDBC", "MySQL"],
     highlights: [
       {
-        text: "Project monitoring and Sakit Detection features in Java, JDBC, MySQL — Figma wireframes, probability graph, detection algorithm, licensing integration.",
+        text: "Built project monitoring and Sakit Detection features in Java, JDBC, and MySQL from Figma wireframes, including a probability graph, the detection algorithm, and license key integration.",
       },
     ],
   },
   {
     company: "Finexus International Sdn Bhd",
     title: "Back-end Developer (Internship)",
-    period: "September 2023 — January 2024",
+    period: "September 2023 - January 2024",
     summary:
-      "Worked on a card management system for banks — API enhancements, performance testing, and data encryption.",
+      "Worked on a card management system for banks: API enhancements, performance testing, and data encryption.",
     stack: ["Java", "SQL", "Jaspersoft"],
     highlights: [
       {
         label: "CARDWORKS",
-        text: "Java and SQL on card management system — API enhancements, concurrent performance tests, encryption, Jaspersoft stakeholder reports.",
+        text: "Worked with Java and SQL on the card management system: API enhancements, concurrent performance tests, data encryption, and Jaspersoft stakeholder reports.",
       },
     ],
   },

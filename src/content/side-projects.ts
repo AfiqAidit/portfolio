@@ -20,7 +20,7 @@ export type SideProject = {
 export const sideProjectsIntro = {
   heading: "Side projects",
   subheading:
-    "Small, self-built versions of the systems I worked on at each company — made with open data, so you can try them yourself.",
+    "Small, self-built versions of the systems I worked on at each company, made with open data so you can try them yourself.",
 };
 
 export const sideProjects: SideProject[] = [
