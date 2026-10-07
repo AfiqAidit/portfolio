@@ -1,0 +1,94 @@
+.gis-map-root .leaflet-container {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--background);
+}
+
+.gis-map-root .leaflet-control-attribution {
+  font-size: 10px;
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  color: var(--muted-foreground);
+  border-radius: 8px;
+  margin: 0 8px 8px 0;
+  padding: 2px 6px;
+}
+
+.gis-map-root .leaflet-control-attribution a {
+  color: var(--accent);
+}
+
+.gis-map-root .leaflet-bar {
+  border: none;
+  box-shadow: none;
+}
+
+.gis-map-root .leaflet-bar a {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  line-height: 28px;
+}
+
+.gis-map-root .leaflet-bar a:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  color: var(--foreground);
+}
+
+.gis-map-preview .leaflet-control-container {
+  display: none;
+}
+
+.gis-map-root .gis-measure-label {
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.12);
+  color: var(--foreground);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.gis-map-root .gis-measure-label::before {
+  display: none;
+}
+
+.gis-map-root .gis-locate-dot span {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #ffffff;
+  border-radius: 9999px;
+  background: #2563eb;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.35);
+}
+
+.gis-map-root .gis-locate-dot span::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: #3b82f6;
+  animation: gis-locate-pulse 2s ease-out infinite;
+  z-index: -1;
+}
+
+@keyframes gis-locate-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gis-map-root .gis-locate-dot span::after {
+    animation: none;
+  }
+}

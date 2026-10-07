@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -13,15 +14,18 @@ const statusLabel: Record<SideProjectStatus, string> = {
 type Props = {
   project: SideProject;
   className?: string;
+  preview?: ReactNode;
 };
 
-export function SideProjectCard({ project, className = "" }: Props) {
+export function SideProjectCard({ project, className = "", preview }: Props) {
   return (
     <Spotlight
       as="article"
       className={`overflow-hidden rounded-2xl border border-border bg-card bg-gradient-to-br ${project.accent} ${className}`}
     >
-      {project.image ? (
+      {preview ? (
+        preview
+      ) : project.image ? (
         <div className="relative aspect-[16/10] w-full border-b border-border bg-background/30">
           <Image
             src={`/projects/${project.image}`}

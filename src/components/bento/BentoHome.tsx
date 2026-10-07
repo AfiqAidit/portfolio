@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { profile } from "@/content/profile";
 import { sideProjects } from "@/content/side-projects";
+import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
 import { SideProjectCard } from "@/components/shared/SideProjectCard";
 import { education, universityProjects } from "@/content/education";
 import { experience } from "@/content/experience";
@@ -64,7 +65,11 @@ export function BentoHome() {
               variants={fadeUp}
               className={sideProjects.length > 1 ? "sm:col-span-6" : "sm:col-span-12"}
             >
-              <SideProjectCard project={p} className="h-full rounded-3xl" />
+              <SideProjectCard
+                project={p}
+                className="h-full rounded-3xl"
+                preview={p.id === "gis-map" ? <GisMapCardPreview /> : undefined}
+              />
             </motion.div>
           ))}
 

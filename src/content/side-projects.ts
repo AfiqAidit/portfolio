@@ -31,14 +31,16 @@ export const sideProjects: SideProject[] = [
     description:
       "A standalone web map showing the kind of mapping features I built for land administration.",
     features: [
-      "Pan, zoom, and switch base maps",
-      "Toggle data layers on and off",
-      "Click a feature to see its details",
-      "Measure distance and area",
-      "Search for a location",
+      "Daerah and mukim boundaries with area details",
+      "10 open data layers: places, roads, rail, rivers, parks",
+      "Switch between street, satellite, and terrain base maps",
+      "Measure distance and area on the map",
+      "Search places, businesses, and map features",
+      "Drop pins to read coordinates, or locate me",
     ],
-    stack: ["Leaflet", "GeoJSON", "Next.js"],
-    status: "planned",
+    stack: ["Leaflet", "GeoJSON", "OpenStreetMap", "Next.js"],
+    status: "live",
+    href: "/demos/gis-map",
     accent: "from-emerald-500/20 to-teal-500/5",
   },
 ];

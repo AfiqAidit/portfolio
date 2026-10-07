@@ -18,6 +18,7 @@ import { education, universityProjects } from "@/content/education";
 import { sideProjects, sideProjectsIntro } from "@/content/side-projects";
 import { knowMe, type KnowMeIcon } from "@/content/personal";
 import { ContactEmail } from "./SiteNav";
+import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
 import { SideProjectCard } from "./SideProjectCard";
 import { Reveal } from "./Reveal";
 import { Spotlight } from "./Spotlight";
@@ -253,7 +254,11 @@ export function SideProjectsSection() {
         >
           {sideProjects.map((p, i) => (
             <Reveal key={p.id} delay={i * 0.08} className="h-full">
-              <SideProjectCard project={p} className="h-full" />
+              <SideProjectCard
+                project={p}
+                className="h-full"
+                preview={p.id === "gis-map" ? <GisMapCardPreview /> : undefined}
+              />
             </Reveal>
           ))}
         </div>
