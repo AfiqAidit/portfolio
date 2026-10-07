@@ -15,11 +15,11 @@ function TimelineItem({
   first: boolean;
   last: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLSpanElement>(null);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 65%", "end 65%"],
+    target: lineRef,
+    offset: ["start center", "end center"],
   });
   const current = job.period.endsWith("Present");
   const lineSpan = `${first ? "top-8" : "top-0"} ${last ? "h-8" : "bottom-0"}`;
@@ -29,9 +29,10 @@ function TimelineItem({
       <p className="hidden pr-8 pt-7 text-right font-mono text-xs text-muted sm:block">
         {job.period}
       </p>
-      <div ref={ref} className={`relative pl-8 ${last ? "" : "pb-8"}`}>
+      <div className={`relative pl-8 ${last ? "" : "pb-8"}`}>
         <p className="pb-2 pt-6 font-mono text-xs text-muted sm:hidden">{job.period}</p>
         <span
+          ref={lineRef}
           aria-hidden
           className={`absolute left-0 w-0.5 -translate-x-1/2 bg-foreground/15 ${lineSpan}`}
         />
@@ -48,7 +49,7 @@ function TimelineItem({
           aria-hidden
           initial={{ scale: 0 }}
           whileInView={{ scale: 1 }}
-          viewport={{ once: true, margin: "0px 0px -35% 0px" }}
+          viewport={{ margin: "0px 0px -50% 0px" }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
           className="absolute -left-1.5 top-7 z-10 h-3 w-3 rounded-full border-2 border-accent bg-background shadow-[0_0_12px_var(--accent)]"
         />
