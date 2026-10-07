@@ -84,6 +84,7 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 - Next.js (App Router), TypeScript, Tailwind CSS, Framer Motion, GSAP, next-themes
 - Repo: `github.com/AfiqAidit/portfolio` → Vercel project `afiqdev` → `https://afiqdev.vercel.app`. Pushing to `main` redeploys
 - Personal GitHub uses its own SSH key (`~/.ssh/id_ed25519_github_personal`); the company GitLab key is separate
+- Commits: short message, the owner as the only author. No `Co-authored-by` or "Made with Cursor" trailers from AI tools
 
 ## Roadmap
 

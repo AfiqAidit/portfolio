@@ -49,6 +49,8 @@ Notes: SPM card uses `showOnResume: false` (website only). Tools not named in jo
 
 GitHub `AfiqAidit/portfolio` (SSH key `~/.ssh/id_ed25519_github_personal`) → Vercel project `afiqdev` → `afiqdev.vercel.app`. Push to `main` redeploys.
 
+Commits: short message, the owner as the only author. Never add `Co-authored-by` or "Made with Cursor" trailers. If one appears anyway (Cursor's Attribution setting), remove it with `git commit --amend` before pushing.
+
 ## Stack (do not swap without discussion)
 
 Next.js App Router, TypeScript, Tailwind CSS, Framer Motion (light UI), GSAP (hero/scroll only unless requested)
