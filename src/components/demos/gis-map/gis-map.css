@@ -1,3 +1,11 @@
+/* Site dark cards are near transparent, which vanishes over light map tiles */
+.dark .gis-map-root,
+.dark .gis-surface {
+  --card: #18181b;
+  --background: #0f0f11;
+  --border: rgb(255 255 255 / 0.14);
+}
+
 .gis-map-root .leaflet-container {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   background: var(--background);
