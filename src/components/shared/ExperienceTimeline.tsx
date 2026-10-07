@@ -18,12 +18,12 @@ export function ExperienceTimeline() {
     <ol ref={ref} className="relative mt-12">
       <span
         aria-hidden
-        className="absolute bottom-0 left-0 top-0 w-px bg-border sm:left-[212px]"
+        className="absolute bottom-0 left-0 top-7 w-0.5 rounded-full bg-foreground/15 sm:left-[212px]"
       />
       <motion.span
         aria-hidden
         style={{ scaleY: reduceMotion ? 1 : scrollYProgress }}
-        className="absolute bottom-0 left-0 top-0 w-px origin-top bg-gradient-to-b from-accent to-accent-2 sm:left-[212px]"
+        className="absolute bottom-0 left-0 top-7 w-0.5 origin-top rounded-full bg-gradient-to-b from-accent to-accent-2 sm:left-[212px]"
       />
       {experience.map((job, i) => {
         const current = job.period.endsWith("Present");
@@ -39,7 +39,7 @@ export function ExperienceTimeline() {
             <div className="relative pl-6">
               <span
                 aria-hidden
-                className="absolute -left-[5px] top-7 h-2.5 w-2.5 rounded-full bg-muted ring-4 ring-background"
+                className="absolute -left-1 top-7 h-2.5 w-2.5 rounded-full bg-muted ring-4 ring-band"
               />
               <motion.span
                 aria-hidden
@@ -47,7 +47,7 @@ export function ExperienceTimeline() {
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true, margin: "0px 0px -40% 0px" }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="absolute -left-[5px] top-7 h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_12px_var(--accent)]"
+                className="absolute -left-1 top-7 h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_12px_var(--accent)]"
               />
               <Reveal>
                 <Spotlight

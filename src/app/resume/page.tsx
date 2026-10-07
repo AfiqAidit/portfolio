@@ -79,7 +79,7 @@ export default function ResumePage() {
                 </span>
                 <span className="font-normal text-[#444]">{e.period}</span>
               </div>
-              <p className="text-sm">CGPA: {e.cgpa}</p>
+              <p className="text-sm">{e.result.label}: {e.result.value}</p>
               {e.bullets.map((b) => (
                 <p key={b} className="text-sm">
                   • {b}

@@ -3,7 +3,7 @@ export const education = [
     school: "Universiti Kebangsaan Malaysia (UKM)",
     degree: "Bachelor of Computer Science (Hons)",
     period: "2020 - 2024",
-    cgpa: "3.86",
+    result: { label: "CGPA", value: "3.86" },
     bullets: [
       "Dean's List Award for 6 semesters",
       "Runner-up, Mobile Application Design Competition Based on AR (SIG)",
@@ -13,7 +13,7 @@ export const education = [
     school: "Universiti Teknologi MARA (UiTM) Dengkil",
     degree: "Foundation in Engineering",
     period: "2019 - 2020",
-    cgpa: "4.00",
+    result: { label: "CGPA", value: "4.00" },
     bullets: [] as string[],
   },
 ];

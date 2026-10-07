@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Award,
   Briefcase,
-  Code2,
   Feather,
   Gamepad2,
   GraduationCap,
@@ -103,9 +102,8 @@ function AtAGlance() {
     {
       icon: GraduationCap,
       label: "Studied",
-      value: `Computer Science, UKM (CGPA ${degree.cgpa})`,
+      value: `Computer Science, UKM (${degree.result.label} ${degree.result.value})`,
     },
-    { icon: Code2, label: "Day to day", value: current.stack.slice(0, 4).join(", ") },
   ];
 
   return (
@@ -183,7 +181,9 @@ export function EducationSection() {
     <section id="education" className="scroll-mt-28 border-t border-border py-20 sm:py-28">
       <Container>
         <SectionHeader index="03" title="Education" />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2">
+        <div
+          className={`mt-12 grid gap-4 sm:grid-cols-2 ${education.length > 2 ? "lg:grid-cols-3" : ""}`}
+        >
           {education.map((e, i) => (
             <Reveal key={e.school} delay={i * 0.08} className="h-full">
               <Spotlight
@@ -195,9 +195,11 @@ export function EducationSection() {
                 <p className="text-sm text-muted-foreground">{e.school}</p>
                 <div className="mt-6 flex items-baseline gap-2">
                   <span className="text-4xl font-semibold tracking-tight text-foreground">
-                    {e.cgpa}
+                    {e.result.value}
                   </span>
-                  <span className="text-xs uppercase tracking-wider text-muted">CGPA</span>
+                  <span className="text-xs uppercase tracking-wider text-muted">
+                    {e.result.label}
+                  </span>
                 </div>
                 {e.bullets.length > 0 ? (
                   <ul className="mt-4 list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">

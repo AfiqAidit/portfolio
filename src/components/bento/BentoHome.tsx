@@ -125,7 +125,7 @@ export function BentoHome() {
               <div key={e.school} className="mt-4">
                 <p className="font-medium text-foreground">{e.degree}</p>
                 <p className="text-sm text-muted-foreground">
-                  {e.school} · CGPA {e.cgpa}
+                  {e.school} · {e.result.label} {e.result.value}
                 </p>
               </div>
             ))}
