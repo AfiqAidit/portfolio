@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Afiq Aidit — Software Engineer",
+  title: "Afiq Aidit | Software Engineer",
   description:
-    "Portfolio of Muhammad Afiq Aidit — Software Engineer. Java, Spring Boot, full stack, and GIS experience.",
+    "Portfolio of Muhammad Afiq Aidit, a Software Engineer with Java, Spring Boot, full stack, and GIS experience.",
 };
 
 export default function RootLayout({

@@ -12,7 +12,7 @@ export default function ResumePage() {
         <LayoutStyleSwitcher />
       </div>
       <div className="border-b border-[#ead7a0] bg-[#fff8e6] px-4 py-2 text-center text-sm text-[#333] print:hidden">
-        HTML resume preview — PDF download coming later.{" "}
+        HTML resume preview. PDF download coming later.{" "}
         <Link href="/" className="underline">
           Back to layouts
         </Link>
@@ -79,7 +79,7 @@ export default function ResumePage() {
                 </span>
                 <span className="font-normal text-[#444]">{e.period}</span>
               </div>
-              <p className="text-sm">{e.detail}</p>
+              <p className="text-sm">CGPA: {e.cgpa}</p>
               {e.bullets.map((b) => (
                 <p key={b} className="text-sm">
                   • {b}
@@ -96,7 +96,7 @@ export default function ResumePage() {
           <div className="mt-2 space-y-1 text-[13.5px]">
             {skillGroups.map((g) => (
               <p key={g.label}>
-                <strong>{g.label}:</strong> {g.items}
+                <strong>{g.label}:</strong> {g.items.join(", ")}
               </p>
             ))}
           </div>

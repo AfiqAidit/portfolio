@@ -107,7 +107,7 @@ export function BentoHome() {
             <ul className="mt-4 space-y-3">
               {universityProjects.map((u) => (
                 <li key={u.name} className="text-sm text-muted-foreground">
-                  <span className="text-foreground">{u.name}</span> — {u.description}
+                  <span className="text-foreground">{u.name}</span>: {u.description}
                 </li>
               ))}
             </ul>
@@ -125,7 +125,7 @@ export function BentoHome() {
               <div key={e.school} className="mt-4">
                 <p className="font-medium text-foreground">{e.degree}</p>
                 <p className="text-sm text-muted-foreground">
-                  {e.school} · {e.detail}
+                  {e.school} · CGPA {e.cgpa}
                 </p>
               </div>
             ))}

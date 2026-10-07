@@ -3,22 +3,25 @@ import {
   AboutSection,
   ExperienceSection,
   EducationSection,
+  SideProjectsSection,
   SkillsSection,
   KnowMeSection,
 } from "@/components/shared/sections";
-import { MotionHero, MotionSideProjects } from "@/components/motion/MotionSections";
+import { MotionHero } from "@/components/motion/MotionSections";
 
 export default function HomePage() {
   return (
     <>
       <SiteNav />
-      <MotionHero />
-      <AboutSection />
-      <ExperienceSection />
-      <EducationSection />
-      <MotionSideProjects />
-      <SkillsSection />
-      <KnowMeSection />
+      <main>
+        <MotionHero />
+        <AboutSection />
+        <ExperienceSection />
+        <EducationSection />
+        <SideProjectsSection />
+        <SkillsSection />
+        <KnowMeSection />
+      </main>
       <SiteFooter />
     </>
   );

@@ -1,13 +1,16 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { profile } from "@/content/profile";
 import { ThemeToggle } from "./ThemeToggle";
 import { LayoutStyleSwitcher } from "./LayoutStyleSwitcher";
+import { MobileMenu } from "./MobileMenu";
 
 const navLinks = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#projects", label: "Projects" },
   { href: "#know-me", label: "Know me" },
+  { href: "#contact", label: "Contact" },
   { href: "/resume", label: "Resume" },
 ];
 
@@ -18,26 +21,14 @@ export function SiteNav() {
       style={{ backgroundColor: "var(--nav)" }}
     >
       <LayoutStyleSwitcher />
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <Link href="/" className="group flex flex-col">
-          <span className="text-xs uppercase tracking-[0.2em] text-muted">
-            Portfolio
-          </span>
-          <span className="font-medium text-foreground group-hover:text-accent">
-            {profile.shortName}
-          </span>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-foreground">
+          <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
+          {profile.shortName}
         </Link>
-        <nav className="flex flex-wrap items-center gap-1 text-sm">
-          {navLinks.map((link) =>
-            link.href.startsWith("#") ? (
-              <a
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-3 py-1.5 text-muted-foreground transition hover:bg-card hover:text-foreground"
-              >
-                {link.label}
-              </a>
-            ) : (
+        <div className="flex items-center gap-1">
+          <nav className="hidden items-center gap-1 text-sm md:flex">
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -45,10 +36,11 @@ export function SiteNav() {
               >
                 {link.label}
               </Link>
-            ),
-          )}
+            ))}
+          </nav>
           <ThemeToggle />
-        </nav>
+          <MobileMenu links={navLinks} />
+        </div>
       </div>
     </header>
   );
@@ -67,17 +59,34 @@ export function ContactEmail() {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 sm:px-6">
-        <p className="text-xs uppercase tracking-widest text-muted">Contact</p>
-        <ContactEmail />
-        <p className="mt-6 text-xs text-muted">
-          © {new Date().getFullYear()} {profile.shortName}. Built with Next.js.
+    <footer id="contact" className="scroll-mt-28 border-t border-border">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <p className="font-mono text-xs text-accent">07</p>
+        <h2 className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-6xl">
+          Get in touch
+        </h2>
+        <p className="mt-4 max-w-xl text-base text-muted-foreground">
+          The best way to reach me is by email.
         </p>
+        <a
+          href={`mailto:${profile.email}`}
+          className="group mt-8 inline-flex items-center gap-2 break-all text-xl font-medium text-foreground transition-colors hover:text-accent sm:text-3xl"
+        >
+          {profile.email}
+          <ArrowUpRight
+            className="h-6 w-6 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </a>
+      </div>
+      <div className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-6 text-xs text-muted sm:px-6">
+          <p>
+            © {new Date().getFullYear()} {profile.shortName}
+          </p>
+          <p>Built with Next.js</p>
+        </div>
       </div>
     </footer>
   );
 }
-
-/** @deprecated Use SiteNav on the main site; kept for archived layout previews */
-export { SiteNav as StyleNav };

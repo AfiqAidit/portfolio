@@ -9,18 +9,20 @@ import {
   KnowMeSection,
 } from "@/components/shared/sections";
 
-/** Archived layout preview — main site is `/`. */
+/** Archived layout preview. The main site is `/`. */
 export default function ClassicStylePage() {
   return (
     <>
       <SiteNav />
-      <SharedHero variant="Classic (archive)" />
-      <AboutSection />
-      <ExperienceSection />
-      <EducationSection />
-      <SideProjectsSection />
-      <SkillsSection />
-      <KnowMeSection />
+      <main>
+        <SharedHero variant="Classic (archive)" />
+        <AboutSection />
+        <ExperienceSection />
+        <EducationSection />
+        <SideProjectsSection />
+        <SkillsSection />
+        <KnowMeSection />
+      </main>
       <SiteFooter />
     </>
   );
