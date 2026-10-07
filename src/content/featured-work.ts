@@ -61,5 +61,5 @@ export const featuredWork: FeaturedWork[] = [
 export const featuredWorkIntro = {
   heading: "Selected work",
   subheading:
-    "Flagship systems I have shipped. Screenshots and interactive demos will be added here — for now, read the summary or see Experience for full detail.",
+    "Production systems I have built and maintained. See Experience below for full role detail.",
 };

@@ -30,6 +30,7 @@ alwaysApply: true
 2. Per-employer demos (e.g. Puncak Tegap → Leaflet at `/demos/...`)
 3. Custom domain + GitHub public repo (commit email must match GitHub for contribution graph)
 4. Optional: PDF resume, LinkedIn/GitHub links when user provides URLs
+5. Project screenshots: add later via `image` in `featured-work.ts` + files in `public/projects/` (redact sensitive data)
 
 ## Stack (do not swap without discussion)
 

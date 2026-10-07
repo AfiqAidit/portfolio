@@ -1,6 +1,6 @@
-# Project screenshots
+# Project screenshots (optional — add when ready)
 
-Drop PNG or WebP files here, then set `image` in `src/content/featured-work.ts`.
+Images are **not required** for the live portfolio. When you have safe screenshots, drop PNG or WebP here and set `image` in `src/content/featured-work.ts`.
 
 Suggested filenames:
 
