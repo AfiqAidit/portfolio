@@ -13,7 +13,7 @@ export type MapScope = "selangor" | "malaysia";
 
 export const SCOPE_OPTIONS: { id: MapScope; label: string }[] = [
   { id: "selangor", label: "Selangor" },
-  { id: "malaysia", label: "All Malaysia" },
+  { id: "malaysia", label: "Malaysia" },
 ];
 
 export const SCOPE_BOUNDS: Record<MapScope, [[number, number], [number, number]]> = {

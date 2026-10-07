@@ -305,8 +305,6 @@ export function GisMapView({ variant, className = "" }: Props) {
 
   const allLayerIds = DATA_LAYERS.map((l) => l.id);
   const allOn = allLayerIds.every((id) => layerOn[id]);
-  const noneOn = allLayerIds.every((id) => !layerOn[id]);
-
   const changeScope = (next: MapScope) => {
     if (next === scopeRef.current) return;
     scopeRef.current = next;
@@ -850,24 +848,13 @@ export function GisMapView({ variant, className = "" }: Props) {
             <div className="mt-4 border-t border-border pt-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-mono text-xs text-accent">Layers</p>
-                <div className="flex gap-2 text-[11px]">
-                  <button
-                    type="button"
-                    className="text-accent hover:underline disabled:cursor-default disabled:text-muted-foreground disabled:no-underline"
-                    disabled={allOn}
-                    onClick={() => setLayers(allLayerIds, true)}
-                  >
-                    Select all
-                  </button>
-                  <button
-                    type="button"
-                    className="text-accent hover:underline disabled:cursor-default disabled:text-muted-foreground disabled:no-underline"
-                    disabled={noneOn}
-                    onClick={() => setLayers(allLayerIds, false)}
-                  >
-                    Deselect all
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="rounded-md border border-border bg-background px-2 py-0.5 text-[11px] text-foreground transition-colors hover:border-accent/50 hover:text-accent"
+                  onClick={() => setLayers(allLayerIds, !allOn)}
+                >
+                  {allOn ? "Deselect all" : "Select all"}
+                </button>
               </div>
               <div
                 role="radiogroup"
