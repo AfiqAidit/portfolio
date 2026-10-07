@@ -89,6 +89,6 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 ## Roadmap
 
 1. Website content and layout, SEO and link preview, layout switcher hidden (done)
-2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Next: demos for the other employers
+2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Next: card API playground inspired by Finexus. Elcorp skipped for now
 3. Add redacted screenshots
 4. PDF resume, custom domain

@@ -39,7 +39,7 @@ Hero → About me → Work experience → Education → Side projects → Skills
 ## Roadmap (owner wants the website finished first)
 
 1. ~~Website content, layout, switcher hidden, SEO + link preview, LinkedIn, analytics~~ (done)
-2. Side project demos: GIS map at `/demos/gis-map` is live (Selangor default, All Malaysia boundaries, OSM layers; data notes in `public/demos/gis-map/SOURCES.md`). Next: demos for the other employers
+2. Side project demos: GIS map at `/demos/gis-map` is live (Selangor default, All Malaysia boundaries, OSM layers; data notes in `public/demos/gis-map/SOURCES.md`). Clinic queue demo live at `/demos/clinic-queue`. Next: card API playground inspired by Finexus
 3. Screenshots via `image` in `side-projects.ts` + files in `public/projects/` (redact sensitive data)
 4. PDF resume, custom domain
 

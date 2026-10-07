@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { profile } from "@/content/profile";
 import { sideProjects } from "@/content/side-projects";
+import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
 import { SideProjectCard } from "@/components/shared/SideProjectCard";
 import { education, universityProjects } from "@/content/education";
@@ -68,7 +69,13 @@ export function BentoHome() {
               <SideProjectCard
                 project={p}
                 className="h-full rounded-3xl"
-                preview={p.id === "gis-map" ? <GisMapCardPreview /> : undefined}
+                preview={
+                  p.id === "gis-map"
+                    ? <GisMapCardPreview />
+                    : p.id === "clinic-queue"
+                      ? <ClinicQueueCardPreview />
+                      : undefined
+                }
               />
             </motion.div>
           ))}

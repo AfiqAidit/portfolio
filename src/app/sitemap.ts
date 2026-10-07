@@ -6,5 +6,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: profile.siteUrl, changeFrequency: "monthly", priority: 1 },
     { url: `${profile.siteUrl}/resume`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${profile.siteUrl}/demos/gis-map`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${profile.siteUrl}/demos/clinic-queue`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${profile.siteUrl}/demos/clinic-queue/book`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${profile.siteUrl}/demos/clinic-queue/display`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${profile.siteUrl}/demos/clinic-queue/staff`, changeFrequency: "monthly", priority: 0.5 },
   ];
 }

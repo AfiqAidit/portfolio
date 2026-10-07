@@ -18,6 +18,7 @@ import { education, universityProjects } from "@/content/education";
 import { sideProjects, sideProjectsIntro } from "@/content/side-projects";
 import { knowMe, type KnowMeIcon } from "@/content/personal";
 import { ContactEmail } from "./SiteNav";
+import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
 import { SideProjectCard } from "./SideProjectCard";
 import { Reveal } from "./Reveal";
@@ -257,7 +258,13 @@ export function SideProjectsSection() {
               <SideProjectCard
                 project={p}
                 className="h-full"
-                preview={p.id === "gis-map" ? <GisMapCardPreview /> : undefined}
+                preview={
+                  p.id === "gis-map"
+                    ? <GisMapCardPreview />
+                    : p.id === "clinic-queue"
+                      ? <ClinicQueueCardPreview />
+                      : undefined
+                }
               />
             </Reveal>
           ))}

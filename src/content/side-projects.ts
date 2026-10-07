@@ -43,4 +43,23 @@ export const sideProjects: SideProject[] = [
     href: "/demos/gis-map",
     accent: "from-emerald-500/20 to-teal-500/5",
   },
+  {
+    id: "clinic-queue",
+    title: "Clinic booking and live queue",
+    inspiredBy: "Selangkah Ventures",
+    description:
+      "A simplified clinic booking and live queue system with fictional data, showing the kind of patient and staff flows I build.",
+    features: [
+      "Book a 15-minute slot at a fictional GP clinic",
+      "Live waiting room display per room",
+      "Staff check-in, walk-ins, and call next",
+      "Queue position and estimated wait on your ticket",
+      "Syncs across browser tabs on your device",
+      "Sample day and auto-play for a quick tour",
+    ],
+    stack: ["Next.js", "TypeScript", "React", "BroadcastChannel"],
+    status: "live",
+    href: "/demos/clinic-queue",
+    accent: "from-sky-500/20 to-blue-500/5",
+  },
 ];
