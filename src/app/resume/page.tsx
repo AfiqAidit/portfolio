@@ -3,19 +3,23 @@ import { profile } from "@/content/profile";
 import { experience } from "@/content/experience";
 import { education } from "@/content/education";
 import { skillGroups } from "@/content/skills";
-import { LayoutStyleSwitcher } from "@/components/shared/LayoutStyleSwitcher";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Resume",
+  description: `Resume of ${profile.name}, ${profile.title}.`,
+};
 
 export default function ResumePage() {
   return (
     <div className="min-h-full bg-[#f3f2ef] text-[#1a1a1a] print:bg-white">
-      <div className="sticky top-0 z-50 border-b border-border bg-background print:hidden">
-        <LayoutStyleSwitcher />
-      </div>
-      <div className="border-b border-[#ead7a0] bg-[#fff8e6] px-4 py-2 text-center text-sm text-[#333] print:hidden">
-        HTML resume preview. PDF download coming later.{" "}
-        <Link href="/" className="underline">
-          Back to layouts
-        </Link>
+      <div className="border-b border-[#e4e2dc] bg-white px-4 py-2.5 text-sm text-[#333] print:hidden">
+        <div className="mx-auto flex max-w-[820px] items-center justify-between gap-3">
+          <Link href="/" className="font-medium hover:underline">
+            ← Back to portfolio
+          </Link>
+          <span className="text-[#666]">PDF download coming soon</span>
+        </div>
       </div>
       <article className="mx-auto my-6 max-w-[820px] bg-white px-10 py-10 shadow-sm print:my-0 print:shadow-none sm:px-12">
         <header className="border-b border-[#222] pb-4 text-center">

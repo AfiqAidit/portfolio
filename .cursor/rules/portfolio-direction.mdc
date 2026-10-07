@@ -11,7 +11,7 @@ Full handoff context (for any AI, not only Cursor): `docs/PROJECT-CONTEXT.md`. K
 
 - Owner: Muhammad Afiq Aidit Bin Mohd Ariff
 - Public title: **Software Engineer** (not “Java developer” alone unless a job-specific fork)
-- Primary contact on site: **email only** → `afiqariff9314@gmail.com` (no phone/GitHub in footer until user adds them)
+- Contact on site: **email** `afiqariff9314@gmail.com` (primary) + **LinkedIn** (`profile.linkedIn`). No phone/GitHub in footer until the owner adds them
 
 ## Page structure (home `/`)
 
@@ -31,15 +31,18 @@ Hero → About me → Work experience → Education → Side projects → Skills
 ## Layout
 
 - **Shipped:** `/` = Motion (GSAP hero + scroll reveal) with the structure above
-- Archive: `/style/classic`, `/style/bento` stay for the owner to compare; keep them on the same content. Layout switcher bar is visible for now; hide it before the site is called finished
+- Archive: `/style/classic`, `/style/bento` stay reachable by URL only (noindex, blocked in `robots.ts`); the layout switcher shows only there (`<SiteNav showLayoutSwitcher />`). `/style/motion` redirects to `/`
+- SEO: metadata in `app/layout.tsx` (uses `profile.siteUrl`), generated `opengraph-image.tsx`, `robots.ts`, `sitemap.ts`. Update `profile.siteUrl` when the custom domain is live
+- Vercel Analytics (`@vercel/analytics`) is in the root layout; enable it in the Vercel dashboard
 - **Theme:** light + dark via `next-themes` (class on `html`); tokens in `globals.css`
 
 ## Roadmap (owner wants the website finished first)
 
-1. Finish the website content and layout (current phase)
-2. Side project demos, starting with the GIS map at `/demos/...`
+1. ~~Website content, layout, switcher hidden, SEO + link preview, LinkedIn, analytics~~ (done)
+2. Side project demos, starting with the GIS map at `/demos/gis-map` (current phase)
 3. Screenshots via `image` in `side-projects.ts` + files in `public/projects/` (redact sensitive data)
-4. Final phase: hide layout switcher, SEO metadata, PDF resume, custom domain
+4. PDF resume, custom domain
+5. Pending content from owner: secondary school name + years (SPM 8A 2B, website only, not `/resume`); which jobs used HTML, CSS, Python, Maven, GitLab, Eclipse, NetBeans, DBeaver
 
 ## Deploy
 

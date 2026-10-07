@@ -10,6 +10,8 @@ export const profile = {
   email: "afiqariff9314@gmail.com",
   phone: "+6017-2199185",
   linkedIn: "https://www.linkedin.com/in/afiq-aidit",
+  /** Public site URL; change when the custom domain is live. */
+  siteUrl: "https://afiqdev.vercel.app",
   taglineLead,
   /** Rotates in the hero after taglineLead */
   taglineTopics,

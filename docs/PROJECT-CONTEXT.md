@@ -5,7 +5,7 @@ Paste this file into any AI assistant (coding or not) so it understands the proj
 ## Who
 
 - **Owner:** Muhammad Afiq Aidit Bin Mohd Ariff ("Afiq Aidit"), Software Engineer based in Hulu Langat, Selangor, Malaysia
-- **Contact shown on site:** email only, `afiqariff9314@gmail.com`
+- **Contact shown on site:** email `afiqariff9314@gmail.com` and LinkedIn
 - **Background:** Java/Spring Boot backends, Laravel, NestJS, Next.js, and GIS (Leaflet, OpenLayers, GeoServer, PostgreSQL)
 
 ## Goal
@@ -77,7 +77,7 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 - Confident blue accent with a cyan partner used only in gradients
 - One signature animation in the hero (dot grid, drifting glows, rotating word); the rest is calm fade-up on scroll; respects reduced-motion
 - No splash/"ENTER" screen, no heavy 3D
-- Layout previews `/style/classic` and `/style/bento` are kept for the owner to compare; the switcher bar will be hidden before launch
+- Layout previews `/style/classic` and `/style/bento` are kept (URL only, hidden from search) for the owner to compare
 
 ## Tech and deploy
 
@@ -87,7 +87,7 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 
 ## Roadmap
 
-1. Finish website content and layout (now)
-2. Build side project demos, starting with the GIS map
+1. Website content and layout, SEO and link preview, layout switcher hidden (done)
+2. Build side project demos, starting with the GIS map (now)
 3. Add redacted screenshots
-4. Final: hide layout switcher, SEO metadata, PDF resume, custom domain
+4. PDF resume, custom domain

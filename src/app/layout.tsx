@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { profile } from "@/content/profile";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,10 +15,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const description = `${profile.title} in ${profile.location}, Malaysia. ${profile.tagline} Java, Spring Boot, full stack, and GIS experience.`;
+
 export const metadata: Metadata = {
-  title: "Afiq Aidit | Software Engineer",
-  description:
-    "Portfolio of Muhammad Afiq Aidit, a Software Engineer with Java, Spring Boot, full stack, and GIS experience.",
+  metadataBase: new URL(profile.siteUrl),
+  title: {
+    default: `${profile.shortName} | ${profile.title}`,
+    template: `%s | ${profile.shortName}`,
+  },
+  description,
+  authors: [{ name: profile.name, url: profile.siteUrl }],
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: profile.shortName,
+    title: `${profile.shortName} | ${profile.title}`,
+    description,
+    locale: "en_MY",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profile.shortName} | ${profile.title}`,
+    description,
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +53,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
