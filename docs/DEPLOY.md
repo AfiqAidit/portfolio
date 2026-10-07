@@ -14,7 +14,7 @@ For a **Next.js** portfolio, the common path is **Git push → host builds for y
 
 ### 1. Create a GitHub repository
 
-1. [github.com/new](https://github.com/new) — name e.g. `portfolio`, **Public** (for contribution graph if you want).
+1. [github.com/new](https://github.com/new): name e.g. `portfolio`, **Public** (for contribution graph if you want).
 2. Do **not** commit `.env` or secrets.
 
 From your machine:
@@ -33,20 +33,20 @@ Use a GitHub-linked email on commits if you want them on your profile graph:
 git config user.email "YOUR_GITHUB_EMAIL@..."
 ```
 
-(Repo-local config only — do not change global git config unless you intend to.)
+(Repo-local config only. Do not change global git config unless you intend to.)
 
 ### 2. Deploy on Vercel (free tier)
 
 1. Sign in at [vercel.com](https://vercel.com) with **GitHub**.
 2. **Add New Project** → import your `portfolio` repo.
 3. Framework: **Next.js** (auto-detected). Build command: `npm run build`. Output: default.
-4. Deploy — you get `https://portfolio-xxx.vercel.app`.
+4. Deploy. You get `https://portfolio-xxx.vercel.app`.
 
 Every `git push` to `main` redeploys (like CI + auto `git pull` + build, but managed).
 
 ### 3. Custom domain (your personal URL)
 
-1. Buy a domain (Namecheap, Cloudflare Registrar, Google Domains successor, etc.) — or use a domain from GitHub if you purchased one there.
+1. Buy a domain (Namecheap, Cloudflare Registrar, Google Domains successor, etc.), or use a domain from GitHub if you purchased one there.
 2. In **Vercel** → Project → **Settings → Domains** → add `afiq.dev` (example) and `www`.
 3. Vercel shows DNS records. At your registrar:
 

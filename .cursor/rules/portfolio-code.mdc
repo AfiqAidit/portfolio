@@ -25,20 +25,20 @@ src/app/                 # routes; prefer one main `/` when preview ends
 
 ## Styling
 
-- Tailwind only — no inline styles except rare GSAP transforms
+- Tailwind only, no inline styles except rare GSAP transforms
 - Reuse tokens from `globals.css`; don’t introduce second color systems
 
 ## Changes
 
-- **Minimal diffs** — don’t refactor unrelated files when editing copy (touch `src/content/` only)
+- **Minimal diffs:** don’t refactor unrelated files when editing copy (touch `src/content/` only)
 - Run `npm run build` after structural/route changes
 - Don’t commit secrets, `.env`, or user resume PDFs from Downloads
 
 ## Content edits
 
 ```typescript
-// ✅ GOOD — update data
+// ✅ GOOD: update data
 // src/content/experience.ts
 
-// ❌ BAD — hardcoded job bullets in page.tsx
+// ❌ BAD: hardcoded job bullets in page.tsx
 ```

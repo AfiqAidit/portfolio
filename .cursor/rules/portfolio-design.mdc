@@ -6,31 +6,40 @@ alwaysApply: false
 
 # Design system
 
+## Writing
+
+- **Never use em dashes (—) or en dashes (–)** in copy, metadata, or comments. Use a plain hyphen `-`, a colon, a full stop, or `|` in titles. The owner sees em dashes as an "AI-written" tell.
+
 ## Theme
 
-- **Light and dark** via CSS variables in `globals.css` (`:root` / `.dark`); toggle in `SiteNav`
-- Accent: sky (`--accent`); avoid purple-on-black “AI slop” gradients
-- Borders: `border-border`; surfaces: `var(--card-muted)` or subtle gradients on project cards only
+- **Light and dark** via CSS variables in `globals.css` (`:root` / `.dark`); default follows the device (`defaultTheme="system"`); toggle in `SiteNav`
+- Accent: confident blue (`--accent`: `#2563eb` light / `#60a5fa` dark) plus cyan `--accent-2` used **only** in gradients (hero rotating word, glow blobs)
+- Avoid purple-on-black "AI slop" gradients
+- Surfaces: `bg-background`, `bg-card` for cards, `bg-band` for alternating sections (Experience, Projects, Know me); borders `border-border`; hover `hover:border-accent/40`
 
 ## Typography
 
-- One sans stack (Geist via layout); uppercase micro-labels with `tracking-[0.2em]` for section titles
-- Hero: large semibold title; body max-width ~`max-w-2xl` for readability
+- One sans stack (Geist) plus Geist Mono for small meta (section index "01", periods, coordinates)
+- Section header: mono accent index + `text-3xl sm:text-4xl font-semibold tracking-tight` h2
+- Hero name: `text-5xl sm:text-7xl lg:text-8xl tracking-tighter`; body max-width ~`max-w-2xl`
 
 ## Layout patterns
 
-- **Motion page:** vertical narrative — hero → about → experience → education → side projects → skills → know me → footer
+- **Home (`/`):** hero, about, experience (timeline), education (CGPA cards), side projects, skills (chip cards), know me (quote + fact cards), footer (`#contact`)
 - **Bento pattern (archive):** 12-column grid, `rounded-3xl` cards, varied `col-span`
-- Section ids used by nav: `about`, `experience`, `education`, `projects`, `skills`, `know-me`
+- Section ids used by nav: `about`, `experience`, `education`, `projects`, `skills`, `know-me`, `contact`
+- Sections: `scroll-mt-28 py-20 sm:py-28`, container `max-w-6xl px-4 sm:px-6`
+- Mobile: nav links collapse into `MobileMenu` below `md`
 
 ## Motion & a11y
 
-- Respect `prefers-reduced-motion`: disable GSAP/Framer entrance animations when set
-- No ENTER splash gates (bad SEO/a11y)
-- Keep animation **subtle** — no full-page WebGL/Three.js unless explicitly requested
-- GSAP: use `gsap.context` + cleanup in `useEffect`; register ScrollTrigger once per client module
+- One signature moment only: the hero (dot grid, drifting glows, rotating topic word, GSAP entrance). Everything else is a calm `Reveal` fade-up on scroll
+- Respect `prefers-reduced-motion`: `MotionConfig reducedMotion="user"`, GSAP and the rotating word skip, CSS drift disabled
+- Rotating text must have an `sr-only` full sentence; decorative layers are `aria-hidden`
+- No ENTER splash gates; no full-page WebGL/Three.js unless explicitly requested
+- GSAP: `gsap.context` + cleanup in `useEffect`
 
 ## Components
 
-- Shared chrome: `SiteNav`, `SiteFooter`, `ContactEmail` in `components/shared/`
-- Section blocks: `components/shared/sections.tsx` — reuse before forking layouts
+- Shared chrome: `SiteNav`, `SiteFooter`, `ContactEmail`, `MobileMenu`, `ThemeToggle` in `components/shared/`
+- Section blocks: `components/shared/sections.tsx`; scroll animation wrapper `Reveal.tsx`; reuse before forking layouts

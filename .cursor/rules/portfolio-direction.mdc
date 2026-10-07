@@ -3,7 +3,7 @@ description: Portfolio product direction, content sources, and phased roadmap
 alwaysApply: true
 ---
 
-# Portfolio — direction
+# Portfolio: direction
 
 Full handoff context (for any AI, not only Cursor): `docs/PROJECT-CONTEXT.md`. Keep it in sync when direction changes.
 
@@ -24,14 +24,14 @@ Hero → About me → Work experience → Education → Side projects → Skills
 
 ## Content
 
-- **Single source of truth:** `src/content/*.ts` — never duplicate copy in components
+- **Single source of truth:** `src/content/*.ts`; never duplicate copy in components
 - Resume HTML: `/resume` from same content; PDF export is a later phase
 - Work text: NDA-safe; sync from user’s resume markdown when they update it
 
 ## Layout
 
 - **Shipped:** `/` = Motion (GSAP hero + scroll reveal) with the structure above
-- Archive: `/style/classic`, `/style/bento` stay for the owner to compare; keep them on the same content. Layout switcher bar is visible for now — hide it before the site is called finished
+- Archive: `/style/classic`, `/style/bento` stay for the owner to compare; keep them on the same content. Layout switcher bar is visible for now; hide it before the site is called finished
 - **Theme:** light + dark via `next-themes` (class on `html`); tokens in `globals.css`
 
 ## Roadmap (owner wants the website finished first)
