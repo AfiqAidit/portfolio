@@ -35,7 +35,7 @@ export function ClinicQueueCardPreview() {
         >
           {num}
         </motion.p>
-        <p className="mt-2 text-xs text-muted-foreground">Room 1 · Dr. Lim</p>
+        <p className="mt-2 text-xs text-muted-foreground">Room 1 · Dr Afiq</p>
       </div>
       <span className="pointer-events-none absolute bottom-3 right-3 rounded-full border border-border bg-card/90 px-3 py-1 text-xs font-medium text-foreground shadow-sm">
         Open full demo

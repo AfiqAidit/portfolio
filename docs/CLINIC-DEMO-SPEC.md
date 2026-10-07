@@ -31,7 +31,7 @@ It is deliberately **one small slice**, not a copy of a real system: a patient b
 
 - Name: **"Demo Family Clinic"** (clearly fictional; show a small "Demo, fictional data" badge on every screen)
 - Hours: 9:00 to 13:00 and 14:00 to 18:00, Monday to Saturday
-- Rooms: **Room 1** and **Room 2**, each with one fictional doctor (e.g. "Dr. Lim", "Dr. Farah"). No surnames that could match real people
+- Rooms: **Room 1** and **Room 2**, each with one fictional doctor (**Dr Afiq**, **Dr Putri**)
 - Services, with an average consult length used for wait estimates:
 
 | Service | Avg minutes |

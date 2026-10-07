@@ -1,4 +1,15 @@
 export const CLINIC_NAME = "Demo Family Clinic";
+
+export const CLINICS = [
+  {
+    id: "demo-family",
+    name: CLINIC_NAME,
+    area: "Demo City, Selangor",
+    hours: "Mon–Sat, 9:00–13:00 and 14:00–18:00",
+  },
+] as const;
+
+export type ClinicId = (typeof CLINICS)[number]["id"];
 export const STORAGE_KEY = "clinic-demo:v1";
 export const MY_TICKETS_KEY = "clinic-demo:my-tickets";
 
@@ -21,8 +32,8 @@ export const SERVICES: { id: ServiceId; label: string; avgMinutes: number }[] = 
 ];
 
 export const ROOMS: { id: RoomId; label: string; doctor: string }[] = [
-  { id: "room1", label: "Room 1", doctor: "Dr. Lim" },
-  { id: "room2", label: "Room 2", doctor: "Dr. Farah" },
+  { id: "room1", label: "Room 1", doctor: "Dr Afiq" },
+  { id: "room2", label: "Room 2", doctor: "Dr Putri" },
 ];
 
 export const SLOT_MINUTES = 15;

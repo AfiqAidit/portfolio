@@ -51,8 +51,8 @@ export const sideProjects: SideProject[] = [
       "A simplified clinic booking and live queue system with fictional data, showing the kind of patient and staff flows I build.",
     features: [
       "Book a 15-minute slot at a fictional GP clinic",
-      "Live waiting room display per room",
-      "Staff check-in, walk-ins, and call next",
+      "Patient, staff, and doctor views with clear roles",
+      "Staff check-in and walk-ins; doctor calls next and TV board",
       "Queue position and estimated wait on your ticket",
       "Syncs across browser tabs on your device",
       "Sample day and auto-play for a quick tour",
