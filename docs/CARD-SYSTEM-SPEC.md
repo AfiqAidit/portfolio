@@ -190,6 +190,32 @@ Each phase ends with something running and its own behind-the-scenes steps, so l
 **Phase 9: deploy**
 - Docker image; Oracle Cloud Always Free (see Hosting)
 
+## 2-day sprint (current plan, Oct 2026)
+
+The owner wants to apply for the job **within about 2 days** and will work full time on this until then. The full plan below takes months, so the sprint builds only the smallest version that still shows the job's key skills. Everything else stays in this spec for later.
+
+**Goal at the end of day 2:** a public GitHub repo with a working app that runs on his Mac, a clear README with screenshots, and a portfolio card marked "In progress" linking to the repo. **No online deployment in the sprint** (Oracle Cloud sign-up and server setup can take a day on their own).
+
+**Day 1**
+1. Install a JDK 21, Maven, and Docker. Start Oracle Database Free in Docker. If Oracle gives trouble on his Mac (Apple Silicon), fall back to WildFly's built-in H2 database for the sprint and switch to Oracle later
+2. Create the Maven project, get a "Hello" servlet running on WildFly
+3. Card classes with the OOP design (`Card`, `DebitCard`, `CreditCard`, `Money`, `CardNumber`) and unit tests
+4. Teller page (Servlet + JSP + EL): issue a card, make a purchase, see approve or decline with the reason. Data saved with JPA
+
+**Day 2**
+1. `AuthorizationService` as a stateless EJB with transactions
+2. "Show what's happening": a timeline panel showing the real steps for each action (filter, servlet, EJB, SQL, timings)
+3. Concurrency test: many purchases at once, without and with locking
+4. README with screenshots, an architecture diagram, and how to run it. Push to a public repo
+5. Portfolio: add the side project card, status "In progress", with the GitHub link
+
+**Stretch, only if time is left:** one JSF back-office page (card list with freeze and unfreeze), one REST endpoint.
+
+**Setup decisions for the sprint**
+- Project folder: `~/Documents/Selangkah/card-system`, its **own git repo** (separate from the portfolio), public on GitHub as `AfiqAidit/card-system`
+- He will use **Cursor to write code** and **Eclipse to run and configure**. Open the `card-system` folder in its own Cursor window, so the AI can work on it directly
+- The portfolio is a separate repo; the only portfolio change in the sprint is the side project card
+
 ## Time and milestones
 
 Rough estimate for a beginner to Java EE working part-time (evenings and weekends). Learning time is included; it is most of the effort at the start and gets faster later.
