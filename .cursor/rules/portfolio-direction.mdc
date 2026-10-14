@@ -40,7 +40,7 @@ Hero → About me → Work experience → Education → Side projects → Skills
 
 1. ~~Website content, layout, switcher hidden, SEO + link preview, LinkedIn, analytics~~ (done)
 2. Side project demos: GIS map at `/demos/gis-map` is live (Selangor default, All Malaysia boundaries, OSM layers; data notes in `public/demos/gis-map/SOURCES.md`). Clinic queue demo live at `/demos/clinic-queue`. Next: one Java EE bank card system inspired by Finexus, with a "Show what's happening" tutorial mode, own repo, WildFly + Oracle on Oracle Cloud. Read `docs/CARD-SYSTEM-SPEC.md` first (owner is new to Java EE: explain plainly, one step at a time)
-3. Screenshots via `image` in `side-projects.ts` + files in `public/projects/` (redact sensitive data)
+3. Demo link-preview screenshots: `opengraph-image.jpg` in each demo route (GIS done, clinic pending). Personal photos for "Know me better" go in `public/personal/` via `photos` in `personal.ts`
 4. PDF resume, custom domain
 
 Notes: SPM card uses `showOnResume: false` (website only). Tools not named in job text go in `alsoUsed` on each role in `experience.ts` (feeds the Skills hover only, not the resume)

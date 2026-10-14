@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,7 +17,12 @@ import { profile } from "@/content/profile";
 import { experience } from "@/content/experience";
 import { education, universityProjects } from "@/content/education";
 import { sideProjects, sideProjectsIntro } from "@/content/side-projects";
-import { knowMe, type KnowMeIcon } from "@/content/personal";
+import {
+  knowMe,
+  type KnowMeFact,
+  type KnowMeIcon,
+  type KnowMePhoto,
+} from "@/content/personal";
 import { ContactEmail } from "./SiteNav";
 import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
@@ -285,7 +291,32 @@ export function SkillsSection() {
   );
 }
 
+const photoGridCols: Record<number, string> = {
+  1: "grid-cols-1",
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+};
+
+function KnowMeFactBody({ fact }: { fact: KnowMeFact }) {
+  const Icon = knowMeIcons[fact.icon];
+  return (
+    <div className="flex gap-4 p-5">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+        <Icon className="h-5 w-5" aria-hidden />
+      </span>
+      <div>
+        <p className="text-xs uppercase tracking-wider text-muted">{fact.label}</p>
+        <p className="mt-1 text-sm text-foreground">{fact.value}</p>
+      </div>
+    </div>
+  );
+}
+
 export function KnowMeSection() {
+  const photoFacts = knowMe.facts.filter(
+    (f): f is KnowMeFact & { photos: KnowMePhoto[] } => (f.photos?.length ?? 0) > 0,
+  );
+  const plainFacts = knowMe.facts.filter((f) => !f.photos?.length);
   return (
     <section
       id="know-me"
@@ -298,25 +329,46 @@ export function KnowMeSection() {
             {knowMe.thinking}
           </blockquote>
         </Reveal>
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {knowMe.facts.map((f, i) => {
-            const Icon = knowMeIcons[f.icon];
-            return (
+        {photoFacts.length > 0 ? (
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2">
+            {photoFacts.map((f, i) => (
               <li key={f.label} className="h-full">
-                <Reveal delay={(i % 3) * 0.06} className="h-full">
-                  <Spotlight className="flex h-full gap-4 rounded-2xl border border-border bg-card p-5">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-                      <Icon className="h-5 w-5" aria-hidden />
-                    </span>
-                    <div>
-                      <p className="text-xs uppercase tracking-wider text-muted">{f.label}</p>
-                      <p className="mt-1 text-sm text-foreground">{f.value}</p>
+                <Reveal delay={(i % 2) * 0.06} className="h-full">
+                  <Spotlight className="h-full overflow-hidden rounded-2xl border border-border bg-card">
+                    <div
+                      className={`grid aspect-[16/10] gap-0.5 border-b border-border bg-border ${photoGridCols[Math.min(f.photos.length, 3)]}`}
+                    >
+                      {f.photos.slice(0, 3).map((p) => (
+                        <div key={p.src} className="relative bg-background">
+                          <Image
+                            src={`/personal/${p.src}`}
+                            alt={p.alt}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, 50vw"
+                          />
+                        </div>
+                      ))}
                     </div>
+                    <KnowMeFactBody fact={f} />
                   </Spotlight>
                 </Reveal>
               </li>
-            );
-          })}
+            ))}
+          </ul>
+        ) : null}
+        <ul
+          className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${photoFacts.length > 0 ? "mt-4" : "mt-12"}`}
+        >
+          {plainFacts.map((f, i) => (
+            <li key={f.label} className="h-full">
+              <Reveal delay={(i % 3) * 0.06} className="h-full">
+                <Spotlight className="h-full rounded-2xl border border-border bg-card">
+                  <KnowMeFactBody fact={f} />
+                </Spotlight>
+              </Reveal>
+            </li>
+          ))}
         </ul>
       </Container>
     </section>

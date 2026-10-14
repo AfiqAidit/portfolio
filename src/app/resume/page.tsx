@@ -26,7 +26,7 @@ export default function ResumePage() {
           <h1 className="text-2xl font-bold uppercase tracking-wide">{profile.name}</h1>
           <p className="mt-1 text-base font-bold">{profile.title}</p>
           <p className="mt-2 text-sm text-[#444]">
-            {profile.email} | {profile.phone} | {profile.location} |{" "}
+            {profile.email} | {profile.location} |{" "}
             <a href={profile.linkedIn} className="text-[#444] underline">
               linkedin.com/in/afiq-aidit
             </a>

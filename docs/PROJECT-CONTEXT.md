@@ -57,8 +57,9 @@ All text is in `src/content/`:
 - **How he thinks:** stays open to other solutions and views, enjoys debating pros and cons to find the better option
 - **Games:** Dota 2, Stardew Valley, Mobile Legends
 - **Sports:** badminton
-- Location, languages, school leadership roles, UKM programming club
-- **Not included on purpose:** travel (he doesn't travel much)
+- Location, languages, UKM programming club
+- **Not included on purpose:** travel (he doesn't travel much), school leadership roles (removed by the owner)
+- **Photos:** a fact can have up to 3 `photos` (files in `public/personal/`); those facts render as larger cards above the rest. Games and Badminton are meant to get the owner's own photos and in-game screenshots
 
 When helping write more: ask the owner questions, use only what they tell you, keep each item short (one sentence), friendly, and professional enough for recruiters. Output in this shape so it can be pasted into `personal.ts`:
 
@@ -90,5 +91,5 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 
 1. Website content and layout, SEO and link preview, layout switcher hidden (done)
 2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Next: a Java EE bank card system inspired by Finexus, aimed at Java EE job openings, in its own repo. It doubles as a tutorial through a "Show what's happening" mode that explains each server step. Runs on WildFly with Oracle, hosted on Oracle Cloud Always Free. Full context, decisions, and plan: `docs/CARD-SYSTEM-SPEC.md`. Elcorp skipped for now
-3. Add redacted screenshots
+3. Link-preview screenshots for demos: `opengraph-image.jpg` + `.alt.txt` in each demo route (GIS done; clinic pending). Home cards use live previews, so `image` in `side-projects.ts` is not shown there. Demo pages set their own `openGraph`, which drops the inherited root image, so set `images` explicitly when a page has no image file
 4. PDF resume, custom domain

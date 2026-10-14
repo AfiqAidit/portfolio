@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import { GisMapDemo } from "@/components/demos/gis-map/GisMapDemo";
 import { DemoProjectHeader } from "@/components/shared/DemoProjectHeader";
 
+const title = "GIS map demo";
+const description =
+  "Interactive Leaflet map of Selangor open boundary data. Pan, measure, search, and explore daerah including Hulu Langat.";
+
 export const metadata: Metadata = {
-  title: "GIS map demo",
-  description:
-    "Interactive Leaflet map of Selangor open boundary data. Pan, measure, search, and explore daerah including Hulu Langat.",
+  title,
+  description,
+  openGraph: { type: "website", url: "/demos/gis-map", title, description },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function GisMapDemoPage() {
