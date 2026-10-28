@@ -26,6 +26,7 @@ import {
 import { ContactEmail } from "./SiteNav";
 import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
+import { PassCardPreview } from "@/components/demos/pass/PassCardPreview";
 import { SideProjectCard } from "./SideProjectCard";
 import { Reveal } from "./Reveal";
 import { Spotlight } from "./Spotlight";
@@ -269,7 +270,9 @@ export function SideProjectsSection() {
                     ? <GisMapCardPreview />
                     : p.id === "clinic-queue"
                       ? <ClinicQueueCardPreview />
-                      : undefined
+                      : p.id === "pass"
+                        ? <PassCardPreview />
+                        : undefined
                 }
               />
             </Reveal>

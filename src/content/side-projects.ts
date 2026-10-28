@@ -3,7 +3,7 @@ export type SideProjectStatus = "planned" | "in-progress" | "live";
 export type SideProject = {
   id: string;
   title: string;
-  /** Previous employer whose work this project recreates */
+  /** Employer or source this project recreates */
   inspiredBy: string;
   description: string;
   features: string[];
@@ -20,7 +20,7 @@ export type SideProject = {
 export const sideProjectsIntro = {
   heading: "Side projects",
   subheading:
-    "Small, self-built versions of the systems I worked on at each company, made with open data so you can try them yourself.",
+    "Small, self-built versions of the systems I worked on at each company, plus a hanging pass you can pull and flip on this site.",
 };
 
 export const sideProjects: SideProject[] = [
@@ -61,5 +61,22 @@ export const sideProjects: SideProject[] = [
     status: "live",
     href: "/demos/clinic-queue",
     accent: "from-sky-500/20 to-blue-500/5",
+  },
+  {
+    id: "pass",
+    title: "Hanging pass",
+    inspiredBy: "a studio pass",
+    description:
+      "A full-page version of the badge on the home page. Pull the strap, let it bounce, and flip it to see the back.",
+    features: [
+      "Nylon webbing strap with a metal clip",
+      "Click to flip, drag to stretch and swing",
+      "Elastic bounce when you let go",
+      "CSS 3D thickness, tilt, and floor shadow",
+    ],
+    stack: ["TypeScript", "CSS", "SVG"],
+    status: "live",
+    href: "/demos/pass",
+    accent: "from-neutral-500/20 to-stone-500/5",
   },
 ];

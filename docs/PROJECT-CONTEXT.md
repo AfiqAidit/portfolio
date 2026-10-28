@@ -22,7 +22,7 @@ A personal portfolio website that looks attractive but stays readable for recrui
 2. **About me:** two short paragraphs
 3. **Work experience:** basics only: role, company, dates, one-line summary, tech chips. Full detail lives on `/resume`
 4. **Education:** UKM (Computer Science, CGPA 3.86, Dean's List x6), UiTM Foundation (CGPA 4.00), plus university/SIG activities
-5. **Side projects:** small self-built versions of what the owner did at each previous company, made with open data so visitors can try them. First one: an interactive GIS map (inspired by Puncak Tegap) with standard mapping features
+5. **Side projects:** small self-built versions of what the owner did at each previous company, made with open data so visitors can try them, plus a hanging pass motion piece. GIS map (Puncak Tegap), clinic queue (Selangkah Ventures), hanging pass at `/demos/pass`
 6. **Skills:** grouped list
 7. **Know me better:** personal, non-work content ("enough about work and code")
 
@@ -77,7 +77,7 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 - Light and dark mode, following the device setting by default
 - Confident blue accent with a cyan partner used only in gradients
 - One signature animation in the hero (dot grid, drifting glows, rotating word); the rest is calm fade-up on scroll; respects reduced-motion
-- No splash/"ENTER" screen, no heavy 3D
+- No splash/"ENTER" screen. Home stays CSS/GSAP. The hanging pass demo at `/demos/pass` is CSS 3D (no Three.js)
 - Layout previews `/style/classic` and `/style/bento` are kept (URL only, hidden from search) for the owner to compare
 
 ## Tech and deploy
@@ -90,6 +90,6 @@ Available icons: `gamepad`, `feather`, `map-pin`, `languages`, `award`, `graduat
 ## Roadmap
 
 1. Website content and layout, SEO and link preview, layout switcher hidden (done)
-2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Next: a Java EE bank card system inspired by Finexus, aimed at Java EE job openings, in its own repo. It doubles as a tutorial through a "Show what's happening" mode that explains each server step. Runs on WildFly with Oracle, hosted on Oracle Cloud Always Free. Full context, decisions, and plan: `docs/CARD-SYSTEM-SPEC.md`. Elcorp skipped for now
+2. Build side project demos. GIS map live at `/demos/gis-map` (done; spec `docs/GIS-DEMO-SPEC.md`, data notes `public/demos/gis-map/SOURCES.md`). Clinic booking and live queue at `/demos/clinic-queue` (done; spec `docs/CLINIC-DEMO-SPEC.md`). Hanging pass at `/demos/pass` (CSS 3D, live). Next: a Java EE bank card system inspired by Finexus, aimed at Java EE job openings, in its own repo. It doubles as a tutorial through a "Show what's happening" mode that explains each server step. Runs on WildFly with Oracle, hosted on Oracle Cloud Always Free. Full context, decisions, and plan: `docs/CARD-SYSTEM-SPEC.md`. Elcorp skipped for now
 3. Link-preview screenshots for demos: `opengraph-image.jpg` + `.alt.txt` in each demo route (GIS done; clinic pending). Home cards use live previews, so `image` in `side-projects.ts` is not shown there. Demo pages set their own `openGraph`, which drops the inherited root image, so set `images` explicitly when a page has no image file
 4. PDF resume, custom domain
