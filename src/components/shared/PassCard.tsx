@@ -20,6 +20,8 @@ const MAX_STRETCH = 2.7;
 const SPRING = 0.14;
 const MAX_SWING = 58;
 const STRAP_HALF = 11;
+const SPIN_DEG = 520;
+const MAX_PULL = 0.93;
 
 type Pt = { x: number; y: number; px: number; py: number };
 
@@ -142,6 +144,7 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
   const [flipped, setFlipped] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
   const flipRef = useRef(setFlipped);
+  const restFlipRef = useRef(false);
 
   useEffect(() => {
     flipRef.current = setFlipped;
@@ -179,6 +182,8 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
     let grabX = 0;
     let grabY = 0;
     let hang = 0;
+    let faceSpin = 0;
+    let spinning = false;
     let lastNudge = performance.now();
     let acc = 0;
     let last = performance.now();
@@ -231,12 +236,25 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
       return true;
     };
 
+    const maxLen = () => {
+      const stretch = variant === "stage" ? 3.15 : MAX_STRETCH;
+      const reach = Math.hypot(Math.max(80, hookX - 32), Math.max(80, stage.clientHeight - hookY - 48));
+      return Math.min(ropeLen * stretch, reach);
+    };
+
+    const settleFace = () => {
+      const turn = ((faceSpin % 360) + 360) % 360;
+      restFlipRef.current = turn > 90 && turn < 270;
+      faceSpin = restFlipRef.current ? 180 : 0;
+      spinning = false;
+      face.style.transition = "transform 700ms ease-out";
+      face.style.transform = `rotateY(${faceSpin}deg)`;
+      flipRef.current(restFlipRef.current);
+    };
+
     const clampGrab = (x: number, y: number) => {
       const min = ropeLen * MIN_LEN;
-      const stageH = stage.clientHeight;
-      const reach = Math.hypot(Math.max(80, hookX - 32), Math.max(80, stageH - hookY - 48));
-      const stretch = variant === "stage" ? 3.15 : MAX_STRETCH;
-      const max = Math.min(ropeLen * stretch, reach);
+      const max = maxLen();
       let dx = x - hookX;
       let dy = y - hookY;
       if (dy < 36) dy = 36;
@@ -278,6 +296,10 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
       line.setAttribute("d", mid);
       hook.setAttribute("transform", `translate(${hookX} ${hookY})`);
       clip.setAttribute("transform", `translate(${end.x} ${end.y}) rotate(${hang})`);
+      if (spinning) {
+        face.style.transition = "none";
+        face.style.transform = `rotateY(${faceSpin}deg)`;
+      }
     };
 
     const step = (dt: number, now: number) => {
@@ -314,8 +336,20 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
           pts[i].y = hookY + (end.y - hookY) * t;
         }
         pin();
+        const pull = Math.hypot(end.x - hookX, end.y - hookY);
+        const atMax = pull >= maxLen() * MAX_PULL;
+        if (atMax && !reduced) {
+          if (!spinning) {
+            spinning = true;
+            faceSpin = restFlipRef.current ? 180 : 0;
+          }
+          faceSpin += SPIN_DEG * dt;
+        } else if (spinning) {
+          settleFace();
+        }
         return;
       }
+      if (spinning) settleFace();
 
       const ex = end.x - hookX;
       const ey = end.y - hookY;
@@ -411,9 +445,14 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
       if (!dragging) {
         end.px = end.x;
         end.py = end.y;
-        flipRef.current((open) => !open);
+        restFlipRef.current = !restFlipRef.current;
+        faceSpin = restFlipRef.current ? 180 : 0;
+        face.style.transition = "transform 700ms ease-out";
+        face.style.transform = `rotateY(${faceSpin}deg)`;
+        flipRef.current(restFlipRef.current);
         return;
       }
+      if (spinning) settleFace();
       dragging = false;
       const ex = end.x - hookX;
       const ey = end.y - hookY;
@@ -503,13 +542,18 @@ export function PassCard({ variant = "hero" }: PassCardProps) {
           aria-pressed={flipped}
           aria-label="Hanging badge. Drag to swing it. Click to turn it over."
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setFlipped((open) => !open);
-            }
+            if (e.key !== "Enter" && e.key !== " ") return;
+            e.preventDefault();
+            restFlipRef.current = !restFlipRef.current;
+            const next = restFlipRef.current;
+            setFlipped(next);
+            const node = faceRef.current;
+            if (!node) return;
+            node.style.transition = "transform 700ms ease-out";
+            node.style.transform = `rotateY(${next ? 180 : 0}deg)`;
           }}
-          className={`aspect-[5/7] w-full touch-none [transform-style:preserve-3d] transition-transform duration-700 ease-out select-none motion-reduce:transition-none ${grabbing ? "cursor-grabbing" : "cursor-grab"}`}
-          style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+          className={`aspect-[5/7] w-full touch-none [transform-style:preserve-3d] select-none motion-reduce:transition-none ${grabbing ? "cursor-grabbing" : "cursor-grab"}`}
+          style={{ transform: "rotateY(0deg)" }}
         >
           <Core depth={depth} />
           <Paper className="shadow-[inset_0_1px_0_rgb(255_255_255/0.45)]" style={{ transform: `translateZ(${faceZ}px)` }}>
