@@ -73,6 +73,7 @@ export const sideProjects: SideProject[] = [
       "Click to flip, drag to stretch and swing",
       "Elastic bounce when you let go",
       "CSS 3D thickness, tilt, and floor shadow",
+      "Cursor sand and a click wave on the studio page",
     ],
     stack: ["TypeScript", "CSS", "SVG"],
     status: "live",
