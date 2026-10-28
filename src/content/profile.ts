@@ -27,6 +27,14 @@ export const profile = {
   ],
   summary:
     "Software engineer with hands-on Java and Spring Boot experience, from a Java/SQL internship to building and maintaining the Spring Boot backends behind the Selangkah mobile app. Also builds web systems with Laravel, Next.js, and NestJS, and previously built GIS applications end to end at Puncak Tegap with JavaScript, C#, and PostgreSQL.",
+  /** Portrait on the hanging badge. File is gitignored: public/personal/me.jpeg */
+  cardPhoto: "/personal/me.jpeg",
+  /** Written on the back of the badge. */
+  cardNote: {
+    kicker: "Behind the photo",
+    title: "End to end.",
+    body: "I like owning a system from the requirement to production.",
+  },
 } as const;
 
 export const styleVariants = [

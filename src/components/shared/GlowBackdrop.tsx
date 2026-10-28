@@ -16,7 +16,7 @@ export function GlowBackdrop({ placement = "top" }: Props) {
 
   useEffect(() => {
     const layer = ref.current;
-    const host = layer?.parentElement;
+    const host = layer?.closest(".group");
     if (!layer || !host) return;
     const onMove = (e: PointerEvent) => {
       const rect = host.getBoundingClientRect();

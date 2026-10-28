@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { profile } from "@/content/profile";
 import { GlowBackdrop } from "@/components/shared/GlowBackdrop";
+import { PassCard } from "@/components/shared/PassCard";
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -58,10 +59,13 @@ export function MotionHero() {
   }, []);
 
   return (
-    <section ref={root} className="group relative overflow-hidden border-b border-border">
-      <GlowBackdrop />
+    <section ref={root} className="group relative overflow-x-clip border-b border-border">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <GlowBackdrop />
+      </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28">
+      <div className="relative mx-auto grid max-w-6xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:gap-8">
+        <div className="relative z-20 min-w-0">
         <p className="motion-line flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
           <span>{profile.title}</span>
@@ -116,6 +120,11 @@ export function MotionHero() {
             </div>
           ))}
         </dl>
+        </div>
+        <div className="hidden lg:block" aria-hidden />
+      </div>
+      <div className="pointer-events-none relative z-30 h-[32rem] lg:absolute lg:inset-0 lg:h-auto">
+        <PassCard />
       </div>
     </section>
   );
