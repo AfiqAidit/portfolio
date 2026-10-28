@@ -39,6 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Portrait used on the hanging badge. Keep local; do not commit.
-/public/personal/me.jpeg
