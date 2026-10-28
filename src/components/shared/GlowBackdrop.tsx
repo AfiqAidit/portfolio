@@ -18,10 +18,11 @@ export function GlowBackdrop({ placement = "top" }: Props) {
     const layer = ref.current;
     const host = layer?.closest(".group");
     if (!layer || !host) return;
-    const onMove = (e: PointerEvent) => {
+    const onMove: EventListener = (e) => {
+      const pe = e as PointerEvent;
       const rect = host.getBoundingClientRect();
-      layer.style.setProperty("--x", `${e.clientX - rect.left}px`);
-      layer.style.setProperty("--y", `${e.clientY - rect.top}px`);
+      layer.style.setProperty("--x", `${pe.clientX - rect.left}px`);
+      layer.style.setProperty("--y", `${pe.clientY - rect.top}px`);
     };
     host.addEventListener("pointermove", onMove);
     return () => host.removeEventListener("pointermove", onMove);
