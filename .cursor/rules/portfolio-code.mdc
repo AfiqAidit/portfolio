@@ -6,6 +6,8 @@ alwaysApply: false
 
 # Code conventions
 
+Full clean code guide: `docs/CLEAN-CODE.md`. Follow it for all new and edited code.
+
 ## Structure
 
 ```
