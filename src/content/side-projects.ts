@@ -63,6 +63,23 @@ export const sideProjects: SideProject[] = [
     accent: "from-sky-500/20 to-blue-500/5",
   },
   {
+    id: "motion-lab",
+    title: "Motion lab",
+    inspiredBy: "interactive nature scenes",
+    description:
+      "A green WebGL meadow: grass bends and parts under your cursor, then springs back, with soft pollen in the air.",
+    features: [
+      "Thousands of green grass blades with wind sway",
+      "Cursor gust bends the tips; roots stay planted",
+      "Looping wind track, on when the page opens",
+      "Quality scaling and reduced-motion fallback",
+    ],
+    stack: ["TypeScript", "Three.js", "WebGL", "React Three Fiber"],
+    status: "live",
+    href: "/demos/motion-lab",
+    accent: "from-emerald-500/25 to-lime-500/5",
+  },
+  {
     id: "pass",
     title: "Hanging pass",
     inspiredBy: "a studio pass",

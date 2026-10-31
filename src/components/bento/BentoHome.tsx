@@ -5,6 +5,7 @@ import { profile } from "@/content/profile";
 import { sideProjects } from "@/content/side-projects";
 import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
+import { MotionLabCardPreview } from "@/components/demos/motion-lab/MotionLabCardPreview";
 import { PassCardPreview } from "@/components/demos/pass/PassCardPreview";
 import { SideProjectCard } from "@/components/shared/SideProjectCard";
 import { education, universityProjects } from "@/content/education";
@@ -77,7 +78,9 @@ export function BentoHome() {
                       ? <ClinicQueueCardPreview />
                       : p.id === "pass"
                         ? <PassCardPreview />
-                        : undefined
+                        : p.id === "motion-lab"
+                          ? <MotionLabCardPreview />
+                          : undefined
                 }
               />
             </motion.div>

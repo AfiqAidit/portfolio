@@ -22,7 +22,7 @@ A personal portfolio website that looks attractive but stays readable for recrui
 2. **About me:** two short paragraphs
 3. **Work experience:** basics only: role, company, dates, one-line summary, tech chips. Full detail lives on `/resume`
 4. **Education:** UKM (Computer Science, CGPA 3.86, Dean's List x6), UiTM Foundation (CGPA 4.00), plus university/SIG activities
-5. **Side projects:** small self-built versions of what the owner did at each previous company, made with open data so visitors can try them, plus a hanging pass motion piece. GIS map (Puncak Tegap), clinic queue (Selangkah Ventures), hanging pass at `/demos/pass`
+5. **Side projects:** small self-built versions of what the owner did at each previous company, made with open data so visitors can try them, plus motion and pass demos. GIS map (Puncak Tegap), clinic queue (Selangkah Ventures), motion lab at `/demos/motion-lab`, hanging pass at `/demos/pass`
 6. **Skills:** grouped list
 7. **Know me better:** personal, non-work content ("enough about work and code")
 

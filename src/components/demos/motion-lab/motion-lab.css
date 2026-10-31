@@ -1,0 +1,14 @@
+.motion-lab-root {
+  --motion-lab-bg: #0b1f12;
+  --motion-lab-glass: rgb(10 30 16 / 0.42);
+  --motion-lab-glass-border: rgb(255 255 255 / 0.2);
+  color: rgb(245 255 248);
+}
+
+.motion-lab-glass {
+  border: 1px solid var(--motion-lab-glass-border);
+  background: var(--motion-lab-glass);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+}

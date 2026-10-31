@@ -27,6 +27,7 @@ import { ContactEmail } from "./SiteNav";
 import { ClinicQueueCardPreview } from "@/components/demos/clinic-queue/ClinicQueueCardPreview";
 import { GisMapCardPreview } from "@/components/demos/gis-map/GisMapCardPreview";
 import { PassCardPreview } from "@/components/demos/pass/PassCardPreview";
+import { MotionLabCardPreview } from "@/components/demos/motion-lab/MotionLabCardPreview";
 import { SideProjectCard } from "./SideProjectCard";
 import { Reveal } from "./Reveal";
 import { Spotlight } from "./Spotlight";
@@ -272,7 +273,9 @@ export function SideProjectsSection() {
                       ? <ClinicQueueCardPreview />
                       : p.id === "pass"
                         ? <PassCardPreview />
-                        : undefined
+                        : p.id === "motion-lab"
+                          ? <MotionLabCardPreview />
+                          : undefined
                 }
               />
             </Reveal>
