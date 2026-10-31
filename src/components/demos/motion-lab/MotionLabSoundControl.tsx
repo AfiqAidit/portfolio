@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 
 type Props = {
   muted: boolean;
@@ -12,11 +12,11 @@ type Props = {
 
 export function MotionLabSoundControl({ muted, active, analyser, onToggle }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef(0);
+  const playing = !muted && active && analyser !== null;
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !playing || !analyser) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -30,21 +30,12 @@ export function MotionLabSoundControl({ muted, active, analyser, onToggle }: Pro
     ctx.scale(dpr, dpr);
 
     const bars = 5;
-    const data = analyser ? new Uint8Array(analyser.frequencyBinCount) : null;
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    let raf = 0;
 
     const draw = () => {
-      rafRef.current = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
       ctx.clearRect(0, 0, w, h);
-
-      if (muted || !active || !analyser || !data) {
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
-        for (let i = 0; i < bars; i++) {
-          const bh = 4 + (i % 3) * 2;
-          ctx.fillRect(4 + i * 10, h / 2 - bh / 2, 3, bh);
-        }
-        return;
-      }
-
       analyser.getByteFrequencyData(data);
       for (let i = 0; i < bars; i++) {
         const sample = data[i + 1] / 255;
@@ -55,21 +46,24 @@ export function MotionLabSoundControl({ muted, active, analyser, onToggle }: Pro
     };
 
     draw();
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [muted, active, analyser]);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, analyser]);
 
   return (
     <button
       type="button"
       onClick={onToggle}
-      className="motion-lab-glass pointer-events-auto relative block h-9 w-12 rounded-full text-white/85 transition hover:bg-white/10"
+      className="motion-lab-glass pointer-events-auto relative block h-9 w-12 rounded-full text-white/90 transition hover:bg-white/10"
       aria-label={muted ? "Unmute sound" : "Mute sound"}
       aria-pressed={!muted}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 m-auto block" aria-hidden />
-      {muted ? (
-        <VolumeX className="absolute inset-0 m-auto h-3.5 w-3.5 opacity-80" aria-hidden />
-      ) : null}
+      {playing ? (
+        <canvas ref={canvasRef} className="absolute inset-0 m-auto block" aria-hidden />
+      ) : muted ? (
+        <VolumeX className="absolute inset-0 m-auto h-4 w-4" aria-hidden />
+      ) : (
+        <Volume2 className="absolute inset-0 m-auto h-4 w-4" aria-hidden />
+      )}
     </button>
   );
 }

@@ -8,9 +8,10 @@ import { MotionLabGrassScene } from "./MotionLabGrassScene";
 type Props = {
   count: number;
   pointer: MutableRefObject<MotionLabPointer | null>;
+  night: boolean;
 };
 
-export function MotionLabGrassCanvas({ count, pointer }: Props) {
+export function MotionLabGrassCanvas({ count, pointer, night }: Props) {
   return (
     <Canvas
       className="absolute inset-0 h-full w-full"
@@ -21,7 +22,7 @@ export function MotionLabGrassCanvas({ count, pointer }: Props) {
         gl.setClearColor(0x000000, 0);
       }}
     >
-      <MotionLabGrassScene count={count} pointer={pointer} />
+      <MotionLabGrassScene count={count} pointer={pointer} night={night} />
     </Canvas>
   );
 }

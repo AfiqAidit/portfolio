@@ -8,6 +8,7 @@ import { profile } from "@/content/profile";
 import { createMotionLabAudio, type MotionLabAudio } from "@/lib/motion-lab/ambience";
 import { fluidQuality } from "@/lib/motion-lab/fluid-sim";
 import type { MotionLabPointer } from "@/lib/motion-lab/pointer";
+import { MotionLabDayNightToggle } from "./MotionLabDayNightToggle";
 import { MotionLabFluidCanvas } from "./MotionLabFluidCanvas";
 import { MotionLabSoundControl } from "./MotionLabSoundControl";
 import "./motion-lab.css";
@@ -33,6 +34,7 @@ export function MotionLabStudio() {
   const reduced = useReducedMotion();
   const [ready, setReady] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [night, setNight] = useState(false);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const audioRef = useRef<MotionLabAudio | null>(null);
   const mutedRef = useRef(false);
@@ -131,7 +133,7 @@ export function MotionLabStudio() {
         ) : ready ? (
           <>
             <MotionLabFluidCanvas active />
-            <MotionLabGrassCanvas count={grassCount} pointer={pointerRef} />
+            <MotionLabGrassCanvas count={grassCount} pointer={pointerRef} night={night} />
           </>
         ) : (
           <div className="absolute inset-0 animate-pulse bg-[#143622]" aria-hidden />
@@ -149,6 +151,7 @@ export function MotionLabStudio() {
           Portfolio
         </Link>
         <div className="flex items-center gap-2">
+          {reduced ? null : <MotionLabDayNightToggle night={night} onToggle={() => setNight((v) => !v)} />}
           <MotionLabSoundControl
             muted={muted || reduced}
             active={!reduced && analyser !== null}
@@ -172,7 +175,7 @@ The streak follows the cursor. Grass leans for a few seconds, then stands back u
           </span>
         </h1>
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
-          A WebGL field at golden hour: rolling hills, a pond, and a small kampung house. Your cursor is a gust; the faster you move, the stronger it blows.
+          A WebGL kampung field at golden hour or under the moon: rolling hills, a pond, and a small stilt house. Your cursor is a gust; the faster you move, the stronger it blows.
         </p>
         {reduced ? (
           <p className="mt-4 text-xs text-white/50">

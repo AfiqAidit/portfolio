@@ -3,7 +3,7 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
-import type { MutableRefObject } from "react";
+import type { MutableRefObject, RefObject } from "react";
 import * as THREE from "three";
 import type { MotionLabPointer } from "@/lib/motion-lab/pointer";
 
@@ -143,6 +143,7 @@ const BLADE_FRAG = `
 uniform vec3 uTip;
 uniform vec3 uBase;
 uniform vec3 uHighlight;
+uniform float uNight;
 varying vec2 vUv;
 varying float vWake;
 
@@ -152,6 +153,8 @@ void main() {
   col = mix(col, vec3(0.93, 0.98, 0.72), vWake * 0.18);
   float edge = smoothstep(0.0, 0.18, vUv.x) * smoothstep(1.0, 0.82, vUv.x);
   col *= 0.82 + edge * 0.18;
+  vec3 moonlit = col * vec3(0.26, 0.36, 0.5) + vec3(0.05, 0.08, 0.14) * smoothstep(0.6, 1.0, vUv.y);
+  col = mix(col, moonlit, uNight);
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -216,6 +219,7 @@ function createRibbon(opacity: number): Ribbon {
 
 const SKY_FN = `
 const vec3 SUN_DIR = vec3(0.6231, 0.3417, -0.7035);
+const vec3 MOON_DIR = vec3(-0.3308, 0.2005, -0.9221);
 
 float skyHash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -243,26 +247,49 @@ float skyFbm(vec2 p) {
   return v;
 }
 
-vec3 skyColor(vec3 dir, float time) {
+float starHash(vec3 p) {
+  return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+}
+
+vec3 skyColor(vec3 dir, float time, float night) {
   float h = clamp(dir.y * 0.55 + 0.15, 0.0, 1.0);
-  vec3 horizon = vec3(0.98, 0.68, 0.38);
-  vec3 zenith = vec3(0.34, 0.62, 0.92);
-  vec3 col = mix(horizon, zenith, smoothstep(0.0, 0.62, h));
+  float grad = smoothstep(0.0, 0.62, h);
   float sunDot = max(dot(dir, SUN_DIR), 0.0);
-  col += vec3(1.0, 0.62, 0.28) * pow(sunDot, 6.0) * 0.4;
+  float moonDot = max(dot(dir, MOON_DIR), 0.0);
+
+  vec3 day = mix(vec3(0.98, 0.68, 0.38), vec3(0.34, 0.62, 0.92), grad);
+  day += vec3(1.0, 0.62, 0.28) * pow(sunDot, 6.0) * 0.4;
+
+  vec3 dark = mix(vec3(0.15, 0.13, 0.3), vec3(0.02, 0.035, 0.1), grad);
+  dark += vec3(0.45, 0.55, 0.9) * pow(moonDot, 10.0) * 0.22;
+
+  if (dir.y > 0.0 && night > 0.001) {
+    vec3 q = dir * 260.0;
+    vec3 cell = floor(q);
+    float rnd = starHash(cell);
+    float twinkle = 0.55 + 0.45 * sin(time * (1.5 + rnd * 3.0) + rnd * 80.0);
+    float star = step(0.992, rnd) * smoothstep(0.42, 0.0, length(fract(q) - 0.5));
+    dark += vec3(0.9, 0.93, 1.0) * star * twinkle * smoothstep(0.03, 0.25, dir.y);
+  }
+
+  vec3 col = mix(day, dark, night);
 
   if (dir.y > 0.0) {
     vec2 uv = dir.xz / (dir.y + 0.14) * 0.8 + vec2(time * 0.012, time * 0.004);
     float n = skyFbm(uv * 1.4);
     float cover = smoothstep(0.48, 0.74, n) * smoothstep(0.0, 0.2, dir.y);
     float depth = skyFbm(uv * 1.4 + vec2(0.18, 0.12));
-    vec3 lit = vec3(1.0, 0.9, 0.78) + vec3(0.35, 0.22, 0.08) * pow(sunDot, 4.0);
-    vec3 shade = vec3(0.86, 0.66, 0.62);
-    vec3 cloud = mix(shade, lit, smoothstep(0.35, 0.75, n - depth + 0.5));
-    col = mix(col, cloud, cover * 0.88);
+    float relief = smoothstep(0.35, 0.75, n - depth + 0.5);
+    vec3 dayLit = vec3(1.0, 0.9, 0.78) + vec3(0.35, 0.22, 0.08) * pow(sunDot, 4.0);
+    vec3 dayCloud = mix(vec3(0.86, 0.66, 0.62), dayLit, relief);
+    vec3 nightLit = vec3(0.3, 0.34, 0.5) + vec3(0.25, 0.28, 0.35) * pow(moonDot, 4.0);
+    vec3 nightCloud = mix(vec3(0.08, 0.09, 0.17), nightLit, relief);
+    col = mix(col, mix(dayCloud, nightCloud, night), cover * mix(0.88, 0.75, night));
   }
 
-  col += vec3(1.0, 0.95, 0.75) * pow(sunDot, 360.0);
+  col += vec3(1.0, 0.95, 0.75) * pow(sunDot, 360.0) * (1.0 - night);
+  col += vec3(0.95, 0.96, 1.0) * smoothstep(0.99972, 0.99982, moonDot) * night;
+  col += vec3(0.6, 0.7, 1.0) * pow(moonDot, 120.0) * 0.35 * night;
   return col;
 }
 `;
@@ -280,6 +307,7 @@ void main() {
 
 const WATER_FRAG = `
 uniform float uTime;
+uniform float uNight;
 varying vec3 vWorld;
 varying vec2 vUv;
 ${SKY_FN}
@@ -294,10 +322,10 @@ void main() {
   vec3 refl = reflect(view, normal);
   refl.y = abs(refl.y);
   float fresnel = 0.35 + 0.65 * pow(1.0 - max(dot(-view, normal), 0.0), 3.0);
-  vec3 deep = vec3(0.1, 0.25, 0.28);
-  vec3 col = mix(deep, skyColor(refl, uTime) * 0.92, fresnel);
+  vec3 deep = mix(vec3(0.1, 0.25, 0.28), vec3(0.015, 0.03, 0.06), uNight);
+  vec3 col = mix(deep, skyColor(refl, uTime, uNight) * 0.92, fresnel);
   float edge = clamp(length(vUv - 0.5) * 2.0, 0.0, 1.0);
-  col = mix(col, vec3(0.2, 0.28, 0.16), smoothstep(0.84, 1.0, edge) * 0.7);
+  col = mix(col, mix(vec3(0.2, 0.28, 0.16), vec3(0.03, 0.05, 0.05), uNight), smoothstep(0.84, 1.0, edge) * 0.7);
   gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -313,12 +341,48 @@ void main() {
 
 const SKY_FRAG = `
 uniform float uTime;
+uniform float uNight;
 varying vec3 vWorld;
 ${SKY_FN}
 void main() {
-  gl_FragColor = vec4(skyColor(normalize(vWorld), uTime), 1.0);
+  gl_FragColor = vec4(skyColor(normalize(vWorld), uTime, uNight), 1.0);
 }
 `;
+
+const FIREFLY_VERT = `
+attribute float aSeed;
+uniform float uTime;
+uniform float uNight;
+uniform float uScale;
+varying float vAlpha;
+void main() {
+  vec3 p = position;
+  p.x += sin(uTime * 0.4 + aSeed * 6.0) * 0.6;
+  p.z += cos(uTime * 0.33 + aSeed * 4.0) * 0.6;
+  p.y += sin(uTime * 0.9 + aSeed * 9.0) * 0.15;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * mv;
+  gl_PointSize = uScale / -mv.z;
+  float pulse = 0.5 + 0.5 * sin(uTime * (1.4 + aSeed) + aSeed * 20.0);
+  vAlpha = uNight * smoothstep(0.15, 0.85, pulse);
+}
+`;
+
+const FIREFLY_FRAG = `
+varying float vAlpha;
+void main() {
+  float d = length(gl_PointCoord - 0.5);
+  float a = smoothstep(0.5, 0.0, d);
+  gl_FragColor = vec4(1.0, 0.92, 0.5, a * a * vAlpha);
+}
+`;
+
+const FIREFLIES = 70;
+
+function seeded(n: number) {
+  const s = Math.sin(n * 12.9898) * 43758.5453;
+  return s - Math.floor(s);
+}
 
 function createBladeGeometry() {
   const segments = 7;
@@ -442,7 +506,13 @@ function Pond({ material }: { material: THREE.ShaderMaterial }) {
   );
 }
 
-function Landscape({ water }: { water: THREE.ShaderMaterial }) {
+function Landscape({
+  water,
+  porchLight,
+}: {
+  water: THREE.ShaderMaterial;
+  porchLight: RefObject<THREE.PointLight | null>;
+}) {
   const terrain = useMemo(() => createTerrain(), []);
   const houseY = groundHeight(HOUSE.x, HOUSE.z);
 
@@ -456,7 +526,7 @@ function Landscape({ water }: { water: THREE.ShaderMaterial }) {
         <Tree key={`${x}-${z}`} x={x} z={z} size={size} />
       ))}
       <group position={[HOUSE.x, houseY, HOUSE.z]} rotation={[0, HOUSE.turn, 0]} scale={HOUSE.scale}>
-        <Homestead />
+        <Homestead porchLight={porchLight} />
       </group>
       {CHICKENS.map((chicken) => (
         <Chicken key={chicken.seed} {...chicken} />
@@ -465,9 +535,15 @@ function Landscape({ water }: { water: THREE.ShaderMaterial }) {
   );
 }
 
-const WOOD = "#9a6a42";
-const WOOD_DARK = "#5a3622";
-const ROOF = "#8f3b2c";
+const WOOD = "#8f4f30";
+const WOOD_DARK = "#4a2616";
+const ROOF = "#7a3a2a";
+const TRIM = "#e8d6b0";
+const SHUTTER = "#d9c7a0";
+const CURTAIN = "#e2b23a";
+const ROOF_PITCH = Math.atan2(0.78, 0.92);
+const ROOF_WIDTH = 1.25;
+const ROOF_APEX = 2.51;
 
 function RoofPrism({
   half,
@@ -511,6 +587,7 @@ function Block({
   rotation,
   glow,
   map,
+  cutout,
 }: {
   size: [number, number, number];
   position: [number, number, number];
@@ -518,6 +595,7 @@ function Block({
   rotation?: [number, number, number];
   glow?: boolean;
   map?: THREE.Texture;
+  cutout?: boolean;
 }) {
   return (
     <mesh position={position} rotation={rotation}>
@@ -525,6 +603,8 @@ function Block({
       <meshStandardMaterial
         color={color}
         map={map ?? null}
+        alphaTest={cutout ? 0.5 : 0}
+        side={cutout ? THREE.DoubleSide : THREE.FrontSide}
         roughness={0.9}
         emissive={glow ? "#ffb04a" : "#000000"}
         emissiveIntensity={glow ? 1.4 : 0}
@@ -555,55 +635,203 @@ function Post({
 }
 
 const HOUSE_POSTS = [-1, -0.33, 0.33, 1].flatMap((x) => [-0.6, 0.6].map((z) => ({ x, z })));
-const BALUSTERS = [-0.56, -0.44, -0.32, 0.32, 0.44, 0.56];
+const FOOTINGS = [...HOUSE_POSTS, { x: -0.6, z: 1.32 }, { x: 0.6, z: 1.32 }];
+const ROOF_Z = (ROOF_WIDTH / 2) * Math.cos(ROOF_PITCH);
+const ROOF_Y = ROOF_APEX + 0.03 - (ROOF_WIDTH / 2) * Math.sin(ROOF_PITCH);
+const EAVE_Z = ROOF_WIDTH * Math.cos(ROOF_PITCH);
+const EAVE_Y = ROOF_APEX + 0.03 - ROOF_WIDTH * Math.sin(ROOF_PITCH);
+const STAIR_PITCH = Math.atan2(0.62, 0.47);
 
-function Homestead() {
+type HouseTextures = {
+  walls: THREE.Texture;
+  roof: THREE.Texture;
+  shutter: THREE.Texture;
+  floor: THREE.Texture;
+  lattice: THREE.Texture;
+  scallop: THREE.Texture;
+};
+
+function HouseWindow({
+  textures,
+  position,
+  rotation,
+}: {
+  textures: HouseTextures;
+  position: [number, number, number];
+  rotation?: [number, number, number];
+}) {
+  return (
+    <group position={position} rotation={rotation}>
+      <Block size={[0.38, 0.44, 0.01]} position={[0, 0, 0.002]} color={WOOD_DARK} />
+      <Block size={[0.3, 0.36, 0.01]} position={[0, 0, 0.006]} color="#ffd28a" glow />
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <Block size={[0.08, 0.36, 0.01]} position={[side * 0.11, 0, 0.012]} color={CURTAIN} />
+          <Block size={[0.13, 0.38, 0.015]} position={[side * 0.26, 0, 0.01]} color={SHUTTER} map={textures.shutter} />
+        </group>
+      ))}
+      <Block size={[0.42, 0.035, 0.05]} position={[0, -0.23, 0.02]} color={TRIM} />
+      <Block size={[0.34, 0.12, 0.006]} position={[0, -0.33, 0.003]} color="#2a1a10" />
+      <Block size={[0.34, 0.12, 0.012]} position={[0, -0.33, 0.01]} color={TRIM} map={textures.lattice} cutout />
+    </group>
+  );
+}
+
+function Football({ position }: { position: [number, number, number] }) {
+  const geometry = useMemo(() => createFootballGeometry(0.11), []);
+  return (
+    <mesh geometry={geometry} position={position} rotation={[0.4, 0.8, 0.2]}>
+      <meshStandardMaterial vertexColors roughness={0.45} />
+    </mesh>
+  );
+}
+
+function FlowerPot({ x, z }: { x: number; z: number }) {
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 0.065, 0]}>
+        <cylinderGeometry args={[0.075, 0.055, 0.13, 12]} />
+        <meshStandardMaterial color="#b5553a" roughness={0.8} />
+      </mesh>
+      <mesh position={[0, 0.2, 0]} scale={[1, 0.85, 1]}>
+        <icosahedronGeometry args={[0.1, 2]} />
+        <meshStandardMaterial color="#3f7a35" roughness={0.95} />
+      </mesh>
+    </group>
+  );
+}
+
+function Homestead({ porchLight }: { porchLight: RefObject<THREE.PointLight | null> }) {
+  const textures = useMemo<HouseTextures>(
+    () => ({
+      walls: createPlankTexture(14),
+      roof: createPlankTexture(28),
+      shutter: createPlankTexture(4),
+      floor: createPlankTexture(8),
+      lattice: createLatticeTexture(),
+      scallop: createScallopTexture(),
+    }),
+    [],
+  );
+
   return (
     <group>
       {HOUSE_POSTS.map((p) => (
         <Post key={`${p.x}-${p.z}`} x={p.x} z={p.z} height={0.8} />
       ))}
-      <Block size={[2.2, 0.1, 1.4]} position={[0, 0.82, 0]} color={WOOD_DARK} />
-      <Block size={[2, 0.86, 1.2]} position={[0, 1.3, 0]} color={WOOD} />
-      <Block size={[2.02, 0.12, 1.22]} position={[0, 1.67, 0]} color="#e8d6b0" />
-      {[-0.72, 0.72].map((x) => (
-        <group key={x}>
-          <Block size={[0.4, 0.44, 0.015]} position={[x, 1.28, 0.6]} color={WOOD_DARK} />
-          <Block size={[0.3, 0.34, 0.02]} position={[x, 1.28, 0.605]} color="#ffd28a" glow />
+      {FOOTINGS.map((p) => (
+        <Block key={`f-${p.x}-${p.z}`} size={[0.13, 0.08, 0.13]} position={[p.x, 0.04, p.z]} color="#b8b2a6" />
+      ))}
+      <Block size={[2.2, 0.1, 1.4]} position={[0, 0.82, 0]} color={WOOD_DARK} map={textures.floor} />
+
+      <Block size={[2, 0.86, 1.2]} position={[0, 1.3, 0]} color={WOOD} map={textures.walls} />
+      <Block size={[2.04, 0.05, 1.24]} position={[0, 0.9, 0]} color={WOOD_DARK} />
+      <Block size={[2.04, 0.05, 1.24]} position={[0, 1.71, 0]} color={WOOD_DARK} />
+      {[-1, 1].flatMap((sx) =>
+        [-1, 1].map((sz) => (
+          <Block key={`${sx}-${sz}`} size={[0.06, 0.86, 0.06]} position={[sx * 1, 1.3, sz * 0.6]} color={WOOD_DARK} />
+        )),
+      )}
+      {[-0.62, 0.62].map((x) => (
+        <HouseWindow key={x} textures={textures} position={[x, 1.34, 0.6]} />
+      ))}
+      <HouseWindow textures={textures} position={[1, 1.34, 0]} rotation={[0, Math.PI / 2, 0]} />
+      <HouseWindow textures={textures} position={[-1, 1.34, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      <Block size={[0.4, 0.68, 0.01]} position={[0, 1.22, 0.602]} color={WOOD_DARK} />
+      <Block size={[0.32, 0.6, 0.008]} position={[0, 1.2, 0.606]} color="#ffd28a" glow />
+      <Block size={[0.17, 0.6, 0.015]} position={[-0.075, 1.2, 0.61]} color={WOOD} map={textures.shutter} />
+
+      <RoofPrism half={0.92} height={0.78} length={2.02} color={WOOD} map={textures.walls} position={[0, 1.73, 0]} />
+      {[-1, 1].map((sx) => (
+        <group key={`gable-${sx}`}>
+          <Block size={[0.006, 0.28, 0.56]} position={[sx * 1.006, 2.02, 0]} color="#2a1a10" />
+          <Block size={[0.012, 0.28, 0.56]} position={[sx * 1.012, 2.02, 0]} color={TRIM} map={textures.lattice} cutout />
         </group>
       ))}
-      <Block size={[0.02, 0.34, 0.3]} position={[1.005, 1.28, 0]} color="#ffd28a" glow />
-      <Block size={[0.34, 0.64, 0.02]} position={[0, 1.2, 0.605]} color={WOOD_DARK} />
-      <RoofPrism half={0.92} height={0.78} length={2.6} color={ROOF} position={[0, 1.73, 0]} />
-      {[-1.3, 1.3].map((x) => (
-        <group key={x} position={[x, 2.56, 0]}>
+      {[-1, 1].map((sz) => (
+        <group key={`roof-${sz}`}>
+          <Block
+            size={[2.8, 0.04, ROOF_WIDTH]}
+            position={[0, ROOF_Y, sz * ROOF_Z]}
+            rotation={[sz * ROOF_PITCH, 0, 0]}
+            color={ROOF}
+            map={textures.roof}
+          />
+          <Block
+            size={[2.8, 0.1, 0.012]}
+            position={[0, EAVE_Y - 0.07, sz * (EAVE_Z + 0.006)]}
+            color={TRIM}
+            map={textures.scallop}
+            cutout
+          />
+          {[-1, 1].map((sx) => (
+            <Block
+              key={sx}
+              size={[0.03, 0.09, ROOF_WIDTH]}
+              position={[sx * 1.4, ROOF_Y - 0.03, sz * ROOF_Z]}
+              rotation={[sz * ROOF_PITCH, 0, 0]}
+              color={TRIM}
+            />
+          ))}
+        </group>
+      ))}
+      <Block size={[2.86, 0.06, 0.1]} position={[0, ROOF_APEX + 0.05, 0]} color={WOOD_DARK} />
+      {[-1.4, 1.4].map((x) => (
+        <group key={x} position={[x, ROOF_APEX + 0.12, 0]}>
           <Block size={[0.04, 0.42, 0.04]} position={[0, 0, 0.07]} rotation={[0.6, 0, 0]} color={WOOD_DARK} />
           <Block size={[0.04, 0.42, 0.04]} position={[0, 0, -0.07]} rotation={[-0.6, 0, 0]} color={WOOD_DARK} />
         </group>
       ))}
 
       {[-0.6, 0.6].map((x) => (
-        <Post key={x} x={x} z={1.32} height={1.44} radius={0.04} />
+        <Post key={x} x={x} z={1.32} height={1.58} radius={0.04} />
       ))}
-      <Block size={[1.3, 0.08, 0.75]} position={[0, 0.62, 0.98]} color={WOOD_DARK} />
-      <Block size={[1.5, 0.05, 0.95]} position={[0, 1.6, 1.05]} rotation={[0.32, 0, 0]} color={ROOF} />
+      <Block size={[1.3, 0.06, 0.75]} position={[0, 0.62, 0.98]} color={WOOD_DARK} map={textures.floor} />
+      <Block
+        size={[1.5, 0.04, 0.62]}
+        position={[0, 1.66, 1.225]}
+        rotation={[0.349, 0, 0]}
+        color={ROOF}
+        map={textures.roof}
+      />
+      <Block size={[1.5, 0.08, 0.012]} position={[0, 1.52, 1.53]} color={TRIM} map={textures.scallop} cutout />
       {[-0.41, 0.41].map((x) => (
-        <Block key={x} size={[0.38, 0.04, 0.04]} position={[x, 0.93, 1.33]} color={WOOD_DARK} />
+        <group key={x}>
+          <Block size={[0.38, 0.04, 0.04]} position={[x, 0.93, 1.33]} color={WOOD_DARK} />
+          <Block size={[0.38, 0.26, 0.012]} position={[x, 0.78, 1.33]} color={TRIM} map={textures.lattice} cutout />
+        </group>
       ))}
       {[-0.63, 0.63].map((x) => (
-        <Block key={x} size={[0.04, 0.04, 0.75]} position={[x, 0.93, 0.98]} color={WOOD_DARK} />
+        <group key={x}>
+          <Block size={[0.04, 0.04, 0.75]} position={[x, 0.93, 0.98]} color={WOOD_DARK} />
+          <Block size={[0.012, 0.26, 0.72]} position={[x, 0.78, 0.98]} color={TRIM} map={textures.lattice} cutout />
+        </group>
       ))}
-      {BALUSTERS.map((x) => (
-        <Block key={x} size={[0.025, 0.3, 0.025]} position={[x, 0.78, 1.33]} color={WOOD_DARK} />
-      ))}
+
       {[0.47, 0.32, 0.17].map((y, i) => (
-        <Block key={y} size={[0.44, 0.05, 0.18]} position={[0, y, 1.47 + i * 0.14]} color={WOOD} />
+        <Block key={y} size={[0.44, 0.04, 0.16]} position={[0, y, 1.47 + i * 0.14]} color={WOOD} map={textures.floor} />
       ))}
-      <mesh position={[0.62, 0.13, 1.72]} scale={[1, 1.15, 1]}>
-        <sphereGeometry args={[0.13, 16, 12]} />
-        <meshStandardMaterial color="#7a4a2a" roughness={0.6} />
-      </mesh>
-      <pointLight position={[0, 1.2, 1.1]} color="#ffb35c" intensity={2.2} distance={5} decay={2} />
+      {[-0.24, 0.24].map((x) => (
+        <group key={x}>
+          <Block
+            size={[0.03, 0.07, 0.78]}
+            position={[x, 0.31, 1.615]}
+            rotation={[STAIR_PITCH, 0, 0]}
+            color={WOOD_DARK}
+          />
+          <Block
+            size={[0.025, 0.025, 0.78]}
+            position={[x, 0.63, 1.615]}
+            rotation={[STAIR_PITCH, 0, 0]}
+            color={WOOD_DARK}
+          />
+          <Post x={x} z={1.84} height={0.42} radius={0.025} />
+        </group>
+      ))}
+      <FlowerPot x={0.55} z={1.8} />
+      <FlowerPot x={-0.55} z={1.85} />
+      <Football position={[0.95, 0.11, 2.3]} />
+      <pointLight ref={porchLight} position={[0, 1.2, 1.1]} color="#ffb35c" intensity={2.2} distance={5} decay={2} />
 
       <group position={[-2.3, 0, -0.7]} rotation={[0, 0.25, 0]} scale={1.15}>
         <ChickenCoop />
@@ -646,12 +874,85 @@ function createPlankTexture(boards: number) {
       ctx.fillRect(x, 0, 2, size);
     }
   }
+  return canvasTexture(canvas);
+}
+
+function canvasTexture(canvas: HTMLCanvasElement) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.anisotropy = 4;
   return texture;
+}
+
+function createLatticeTexture() {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 4;
+    for (let i = -size; i <= size * 2; i += 16) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + size, size);
+      ctx.moveTo(i, size);
+      ctx.lineTo(i + size, 0);
+      ctx.stroke();
+    }
+    ctx.lineWidth = 8;
+    ctx.strokeRect(0, 0, size, size);
+  }
+  return canvasTexture(canvas);
+}
+
+function createScallopTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 32;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 256, 14);
+    for (let i = 0; i < 16; i++) {
+      ctx.beginPath();
+      ctx.arc(8 + i * 16, 14, 7, 0, Math.PI);
+      ctx.fill();
+    }
+  }
+  return canvasTexture(canvas);
+}
+
+/** Black pentagons sit on the 12 icosahedron vertices, like a classic football. */
+function createFootballGeometry(radius: number) {
+  const geo = new THREE.IcosahedronGeometry(radius, 4);
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const patches = [
+    [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+    [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+    [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1],
+  ].map(([x, y, z]) => new THREE.Vector3(x, y, z).normalize());
+  const colors = new Float32Array(pos.count * 3);
+  const centre = new THREE.Vector3();
+  for (let tri = 0; tri < pos.count; tri += 3) {
+    centre.set(0, 0, 0);
+    for (let k = 0; k < 3; k++) {
+      centre.x += pos.getX(tri + k);
+      centre.y += pos.getY(tri + k);
+      centre.z += pos.getZ(tri + k);
+    }
+    centre.normalize();
+    let near = -1;
+    for (const p of patches) near = Math.max(near, centre.dot(p));
+    const shade = near > 0.94 ? 0.06 : 0.95;
+    for (let k = 0; k < 3; k++) colors.set([shade, shade, shade], (tri + k) * 3);
+  }
+  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return geo;
 }
 
 function ChickenCoop() {
@@ -806,10 +1107,63 @@ function Chicken({ seed, body }: { seed: number; body: string }) {
 type Props = {
   count: number;
   pointer: MutableRefObject<MotionLabPointer | null>;
+  night: boolean;
 };
 
-export function MotionLabGrassScene({ count, pointer }: Props) {
+const NIGHT_FADE_SECONDS = 2.2;
+const DAY_LOOK = {
+  fog: new THREE.Color("#eebb80"),
+  ambient: new THREE.Color("#fff4e0"),
+  sun: new THREE.Color("#ffe1a8"),
+  sky: new THREE.Color("#8ec5ff"),
+  ground: new THREE.Color("#3d6b32"),
+  sunPos: new THREE.Vector3(14, 10, -10),
+};
+const NIGHT_LOOK = {
+  fog: new THREE.Color("#141c34"),
+  ambient: new THREE.Color("#6a7cc0"),
+  sun: new THREE.Color("#9fb4ff"),
+  sky: new THREE.Color("#2a3a70"),
+  ground: new THREE.Color("#0d1a12"),
+  sunPos: new THREE.Vector3(-12, 11, -14),
+};
+
+function createFireflyGeometry() {
+  const positions = new Float32Array(FIREFLIES * 3);
+  const seeds = new Float32Array(FIREFLIES);
+  for (let i = 0; i < FIREFLIES; i++) {
+    const x = (seeded(i + 1) - 0.5) * 24;
+    const z = -11 + seeded(i + 101) * 19;
+    positions.set([x, groundHeight(x, z) + 0.4 + seeded(i + 201) * 0.9, z], i * 3);
+    seeds[i] = seeded(i + 301);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+  return geo;
+}
+
+export function MotionLabGrassScene({ count, pointer, night }: Props) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
+  const nightMix = useRef(night ? 1 : 0);
+  const fogRef = useRef<THREE.Fog>(null);
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const sunRef = useRef<THREE.DirectionalLight>(null);
+  const hemiRef = useRef<THREE.HemisphereLight>(null);
+  const porchRef = useRef<THREE.PointLight>(null);
+  const fireflyGeometry = useMemo(() => createFireflyGeometry(), []);
+  const fireflyMaterial = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 0 }, uNight: { value: 0 }, uScale: { value: 70 } },
+        vertexShader: FIREFLY_VERT,
+        fragmentShader: FIREFLY_FRAG,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    [],
+  );
   const lastScreen = useRef<{ x: number; y: number } | null>(null);
   const lastHit = useRef<THREE.Vector2 | null>(null);
   const gust = useRef(0);
@@ -861,6 +1215,7 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
           uTip: { value: new THREE.Color("#b6e86a") },
           uBase: { value: new THREE.Color("#1a5a28") },
           uHighlight: { value: new THREE.Color("#f3ffd2") },
+          uNight: { value: 0 },
         },
         vertexShader: BLADE_VERT,
         fragmentShader: BLADE_FRAG,
@@ -872,7 +1227,7 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
   const waterMaterial = useMemo(
     () =>
       new THREE.ShaderMaterial({
-        uniforms: { uTime: { value: 0 } },
+        uniforms: { uTime: { value: 0 }, uNight: { value: 0 } },
         vertexShader: WATER_VERT,
         fragmentShader: WATER_FRAG,
       }),
@@ -882,7 +1237,7 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
   const skyMaterial = useMemo(
     () =>
       new THREE.ShaderMaterial({
-        uniforms: { uTime: { value: 0 } },
+        uniforms: { uTime: { value: 0 }, uNight: { value: 0 } },
         vertexShader: SKY_VERT,
         fragmentShader: SKY_FRAG,
         side: THREE.BackSide,
@@ -943,6 +1298,32 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
     const g = gust.current;
     waterMaterial.uniforms.uTime.value = state.clock.elapsedTime;
     skyMaterial.uniforms.uTime.value = state.clock.elapsedTime;
+    fireflyMaterial.uniforms.uTime.value = state.clock.elapsedTime;
+    fireflyMaterial.uniforms.uScale.value = 110 * state.gl.getPixelRatio();
+
+    const fadeStep = delta / NIGHT_FADE_SECONDS;
+    nightMix.current += Math.max(-fadeStep, Math.min(fadeStep, (night ? 1 : 0) - nightMix.current));
+    const n = nightMix.current * nightMix.current * (3 - 2 * nightMix.current);
+    material.uniforms.uNight.value = n;
+    waterMaterial.uniforms.uNight.value = n;
+    skyMaterial.uniforms.uNight.value = n;
+    fireflyMaterial.uniforms.uNight.value = n;
+    fogRef.current?.color.lerpColors(DAY_LOOK.fog, NIGHT_LOOK.fog, n);
+    if (ambientRef.current) {
+      ambientRef.current.intensity = THREE.MathUtils.lerp(0.45, 0.16, n);
+      ambientRef.current.color.lerpColors(DAY_LOOK.ambient, NIGHT_LOOK.ambient, n);
+    }
+    if (sunRef.current) {
+      sunRef.current.intensity = THREE.MathUtils.lerp(1.15, 0.45, n);
+      sunRef.current.color.lerpColors(DAY_LOOK.sun, NIGHT_LOOK.sun, n);
+      sunRef.current.position.lerpVectors(DAY_LOOK.sunPos, NIGHT_LOOK.sunPos, n);
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = THREE.MathUtils.lerp(0.45, 0.2, n);
+      hemiRef.current.color.lerpColors(DAY_LOOK.sky, NIGHT_LOOK.sky, n);
+      hemiRef.current.groundColor.lerpColors(DAY_LOOK.ground, NIGHT_LOOK.ground, n);
+    }
+    if (porchRef.current) porchRef.current.intensity = THREE.MathUtils.lerp(2.2, 5.5, n);
     ndc.set(p ? p.x * 2 - 1 : 9, -(p ? p.y * 2 - 1 : 9));
     raycaster.setFromCamera(ndc, camera);
 
@@ -1101,16 +1482,17 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
 
   return (
     <>
-      <fog attach="fog" args={["#eebb80", 24, 78]} />
+      <fog ref={fogRef} attach="fog" args={["#eebb80", 24, 78]} />
       <mesh scale={80} frustumCulled={false}>
         <sphereGeometry args={[1, 32, 20]} />
         <primitive object={skyMaterial} attach="material" />
       </mesh>
-      <ambientLight intensity={0.45} color="#fff4e0" />
-      <directionalLight position={[14, 10, -10]} intensity={1.15} color="#ffe1a8" />
-      <hemisphereLight args={["#8ec5ff", "#3d6b32", 0.45]} />
-      <Landscape water={waterMaterial} />
+      <ambientLight ref={ambientRef} intensity={0.45} color="#fff4e0" />
+      <directionalLight ref={sunRef} position={[14, 10, -10]} intensity={1.15} color="#ffe1a8" />
+      <hemisphereLight ref={hemiRef} args={["#8ec5ff", "#3d6b32", 0.45]} />
+      <Landscape water={waterMaterial} porchLight={porchRef} />
       <instancedMesh ref={meshRef} args={[geometry, material, count]} frustumCulled={false} />
+      <points geometry={fireflyGeometry} material={fireflyMaterial} frustumCulled={false} />
       {ribbons.map((ribbon) => (
         <mesh key={ribbon.mat.uuid} geometry={ribbon.geo} material={ribbon.mat} frustumCulled={false} />
       ))}
