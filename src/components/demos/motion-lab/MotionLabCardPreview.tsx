@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import preview from "../../../../public/demos/motion-lab/preview.jpg";
 
 export function MotionLabCardPreview() {
   return (
@@ -8,7 +9,8 @@ export function MotionLabCardPreview() {
       className="group/preview relative block aspect-[16/10] w-full overflow-hidden border-b border-border bg-[#0f2918]"
     >
       <Image
-        src="/demos/motion-lab/preview.jpg"
+        src={preview}
+        placeholder="blur"
         alt="WebGL grass field at golden hour with a kampung stilt house, chicken coop, and pond"
         fill
         sizes="(min-width: 1024px) 640px, 100vw"

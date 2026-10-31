@@ -1104,6 +1104,590 @@ function Chicken({ seed, body }: { seed: number; body: string }) {
   );
 }
 
+const BUTTERFLY_SPOTS = [
+  { x: -2.6, z: -1.2 },
+  { x: 3.4, z: 0.6 },
+  { x: 7.8, z: -2.6 },
+  { x: -6.8, z: 1.4 },
+  { x: 0.6, z: -8.4 },
+  { x: 9.6, z: -8.6 },
+  { x: -0.8, z: -4.6 },
+  { x: 5.6, z: -9.6 },
+  { x: -9.6, z: -2.8 },
+];
+
+/** Rings along a capsule (v runs head to tail), with an optional pale stripe down each side. */
+function createBandTexture(base: string, band: string, rings: number, stripe?: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 64, 128);
+    if (stripe) {
+      ctx.fillStyle = stripe;
+      ctx.fillRect(12, 0, 6, 128);
+      ctx.fillRect(44, 0, 6, 128);
+    }
+    ctx.fillStyle = band;
+    for (let i = 1; i < rings; i++) ctx.fillRect(0, (i / rings) * 128 - 2, 64, 4);
+  }
+  return canvasTexture(canvas);
+}
+
+/** Herringbone marks on a grasshopper's jumping thigh. */
+function createFemurTexture(base: string, mark: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 32;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 32, 64);
+    ctx.strokeStyle = mark;
+    ctx.lineWidth = 2.5;
+    for (let y = 4; y < 64; y += 8) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(16, y + 5);
+      ctx.lineTo(32, y);
+      ctx.stroke();
+    }
+  }
+  return canvasTexture(canvas);
+}
+
+function createDragonflyWingTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 32;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = "rgba(225, 240, 255, 0.32)";
+    ctx.fillRect(0, 0, 128, 32);
+    ctx.strokeStyle = "rgba(40, 50, 60, 0.55)";
+    ctx.lineWidth = 1;
+    for (let x = 8; x < 128; x += 9) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + 3, 32);
+      ctx.stroke();
+    }
+    for (const y of [9, 17, 25]) {
+      ctx.beginPath();
+      ctx.moveTo(0, 16);
+      ctx.lineTo(128, y);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(30, 30, 35, 0.95)";
+    ctx.fillRect(0, 0, 128, 3);
+    ctx.fillRect(104, 2, 10, 6);
+  }
+  return canvasTexture(canvas);
+}
+
+function createDragonflyWingGeometry(length: number, width: number) {
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0);
+  shape.bezierCurveTo(length * 0.3, width * 0.65, length * 0.9, width * 0.6, length, width * 0.15);
+  shape.bezierCurveTo(length, -width * 0.3, length * 0.5, -width * 0.5, 0, -width * 0.15);
+  shape.lineTo(0, 0);
+  const geo = new THREE.ShapeGeometry(shape, 10);
+  geo.computeBoundingBox();
+  const box = geo.boundingBox ?? new THREE.Box3();
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const uv = geo.attributes.uv as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    uv.setXY(
+      i,
+      (pos.getX(i) - box.min.x) / (box.max.x - box.min.x),
+      (pos.getY(i) - box.min.y) / (box.max.y - box.min.y),
+    );
+  }
+  geo.rotateX(-Math.PI / 2);
+  return geo;
+}
+
+const DRAGONFLY_LOOKS = [
+  { body: "#2a8fbf", band: "#10324a", eye: "#1d4f7a", thorax: "#3a6f8f" },
+  { body: "#c8392b", band: "#4a1410", eye: "#7a1f1a", thorax: "#8a3a2a" },
+  { body: "#3a9a5a", band: "#163a22", eye: "#2a5a3a", thorax: "#4a7a3a" },
+];
+
+function Dragonflies({ nightMix }: { nightMix: MutableRefObject<number> }) {
+  const groups = useRef<(THREE.Group | null)[]>([]);
+  const leftWings = useRef<(THREE.Group | null)[]>([]);
+  const rightWings = useRef<(THREE.Group | null)[]>([]);
+  const flyers = useRef(
+    DRAGONFLY_LOOKS.map(() => ({ ready: false, x: 0, y: 0, z: 0, tx: 0, ty: 0, tz: 0, wait: 0, heading: 0 })),
+  );
+  const parts = useMemo(() => {
+    const wingMap = createDragonflyWingTexture();
+    return {
+      foreWing: createDragonflyWingGeometry(0.15, 0.032),
+      hindWing: createDragonflyWingGeometry(0.14, 0.042),
+      wing: new THREE.MeshStandardMaterial({
+        map: wingMap,
+        transparent: true,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        roughness: 0.3,
+      }),
+      looks: DRAGONFLY_LOOKS.map((look) => ({
+        abdomen: new THREE.MeshStandardMaterial({ map: createBandTexture(look.body, look.band, 9), roughness: 0.45 }),
+        thorax: new THREE.MeshStandardMaterial({
+          map: createBandTexture(look.thorax, look.band, 3, "#e8d070"),
+          roughness: 0.5,
+        }),
+        eye: new THREE.MeshStandardMaterial({ color: look.eye, roughness: 0.15, metalness: 0.2 }),
+      })),
+    };
+  }, []);
+
+  useFrame((state, delta) => {
+    const t = state.clock.elapsedTime;
+    const day = 1 - nightMix.current;
+    parts.wing.opacity = day;
+    flyers.current.forEach((d, i) => {
+      const g = groups.current[i];
+      const l = leftWings.current[i];
+      const r = rightWings.current[i];
+      if (!g || !l || !r) return;
+      g.visible = day > 0.02;
+      if (!g.visible) return;
+      const pick = () => {
+        const a = Math.random() * Math.PI * 2;
+        const reach = 0.3 + Math.random() * 1.1;
+        d.tx = POND.x + Math.cos(a) * POND.rx * reach;
+        d.tz = POND.z + Math.sin(a) * POND.rz * reach;
+        d.ty = 0.35 + Math.random() * 0.6;
+      };
+      if (!d.ready) {
+        pick();
+        d.x = d.tx;
+        d.y = d.ty;
+        d.z = d.tz;
+        d.wait = Math.random() * 1.5;
+        d.ready = true;
+      }
+      const dx = d.tx - d.x;
+      const dy = d.ty - d.y;
+      const dz = d.tz - d.z;
+      const dist = Math.hypot(dx, dy, dz);
+      let jitter = 0;
+      if (d.wait > 0) {
+        d.wait -= delta;
+        jitter = Math.sin(t * 7 + i) * 0.012;
+        if (d.wait <= 0) pick();
+      } else if (dist < 0.04) {
+        d.wait = 0.6 + Math.random() * 1.8;
+      } else {
+        const step = Math.min(dist, Math.max(0.8, dist * 5) * delta);
+        d.x += (dx / dist) * step;
+        d.y += (dy / dist) * step;
+        d.z += (dz / dist) * step;
+        let turn = Math.atan2(dx, dz) - d.heading;
+        turn = Math.atan2(Math.sin(turn), Math.cos(turn));
+        d.heading += turn * Math.min(1, delta * 14);
+      }
+      g.position.set(d.x, d.y + jitter, d.z);
+      g.rotation.y = d.heading;
+      const flap = Math.sin(t * 48 + i) * 0.35;
+      l.rotation.z = -flap;
+      r.rotation.z = flap;
+    });
+  });
+
+  return (
+    <>
+      {parts.looks.map((look, i) => (
+        <group
+          key={i}
+          ref={(el) => {
+            groups.current[i] = el;
+          }}
+          scale={1.6}
+        >
+          <mesh position={[0, 0, -0.07]} rotation={[-Math.PI / 2, 0, 0]} material={look.abdomen}>
+            <capsuleGeometry args={[0.008, 0.17, 3, 8]} />
+          </mesh>
+          <mesh position={[0, 0.004, 0.035]} scale={[1, 1.05, 1.4]} rotation={[-Math.PI / 2, 0, 0]} material={look.thorax}>
+            <sphereGeometry args={[0.017, 12, 10]} />
+          </mesh>
+          {[-1, 1].map((side) => (
+            <mesh key={side} position={[side * 0.011, 0.006, 0.068]} material={look.eye}>
+              <sphereGeometry args={[0.013, 12, 10]} />
+            </mesh>
+          ))}
+          {[-1, 1].map((side) => (
+            <group
+              key={side}
+              ref={(el) => {
+                if (side < 0) leftWings.current[i] = el;
+                else rightWings.current[i] = el;
+              }}
+              position={[side * 0.008, 0.016, 0.035]}
+              scale={[side, 1, 1]}
+            >
+              <mesh position={[0, 0, 0.012]} rotation={[0, 0.12, 0]} geometry={parts.foreWing} material={parts.wing} />
+              <mesh position={[0, 0, -0.014]} rotation={[0, -0.12, 0]} geometry={parts.hindWing} material={parts.wing} />
+            </group>
+          ))}
+        </group>
+      ))}
+    </>
+  );
+}
+
+const HOPPER_SPOTS = [
+  { x: -4.5, z: 2.5 },
+  { x: 2.5, z: 3.5 },
+  { x: 6.5, z: 0.5 },
+  { x: -1, z: -3 },
+];
+
+const HOPPER_LOOKS = [
+  { body: "#7cb342", dark: "#4e7a22", stripe: "#d6e27a", wing: "#8d9f4a", eye: "#5a3a1e" },
+  { body: "#9aae4a", dark: "#5f6f22", stripe: "#e6d98a", wing: "#a59a5a", eye: "#4a2a14" },
+  { body: "#a08050", dark: "#5a4224", stripe: "#e0c890", wing: "#8a7048", eye: "#3a2210" },
+  { body: "#6fa83a", dark: "#3f6a1e", stripe: "#cfe07a", wing: "#7f9a40", eye: "#5a3a1e" },
+];
+
+function Grasshoppers({ nightMix }: { nightMix: MutableRefObject<number> }) {
+  const groups = useRef<(THREE.Group | null)[]>([]);
+  const knees = useRef<(THREE.Group | null)[]>([]);
+  const hips = useRef<(THREE.Group | null)[]>([]);
+  const looks = useMemo(
+    () =>
+      HOPPER_LOOKS.map((look) => ({
+        abdomen: new THREE.MeshStandardMaterial({
+          map: createBandTexture(look.body, look.dark, 7, look.stripe),
+          roughness: 0.7,
+        }),
+        thorax: new THREE.MeshStandardMaterial({
+          map: createBandTexture(look.dark, look.body, 2, look.stripe),
+          roughness: 0.6,
+        }),
+        head: new THREE.MeshStandardMaterial({ color: look.body, roughness: 0.6 }),
+        femur: new THREE.MeshStandardMaterial({ map: createFemurTexture(look.body, look.dark), roughness: 0.7 }),
+        leg: new THREE.MeshStandardMaterial({ color: look.dark, roughness: 0.8 }),
+        wing: new THREE.MeshStandardMaterial({
+          map: createBandTexture(look.wing, look.dark, 5),
+          roughness: 0.8,
+        }),
+        eye: new THREE.MeshStandardMaterial({ color: look.eye, roughness: 0.2 }),
+      })),
+    [],
+  );
+  const hoppers = useRef(
+    HOPPER_SPOTS.map((spot, i) => ({
+      x: spot.x,
+      z: spot.z,
+      fx: spot.x,
+      fz: spot.z,
+      tx: spot.x,
+      tz: spot.z,
+      wait: 0.8 + i * 0.9,
+      p: -1,
+      peak: 1,
+      dur: 0.6,
+      heading: 0,
+    })),
+  );
+
+  useFrame((state, delta) => {
+    const day = 1 - nightMix.current;
+    hoppers.current.forEach((h, i) => {
+      const g = groups.current[i];
+      if (!g) return;
+      g.visible = day > 0.02;
+      if (!g.visible) return;
+      let y = groundHeight(h.x, h.z) + 0.1;
+      let pitch = 0;
+      let kick = 0;
+      if (h.p >= 0) {
+        h.p = Math.min(1, h.p + delta / h.dur);
+        h.x = h.fx + (h.tx - h.fx) * h.p;
+        h.z = h.fz + (h.tz - h.fz) * h.p;
+        y = groundHeight(h.x, h.z) + 0.1 + 4 * h.peak * h.p * (1 - h.p);
+        pitch = (h.p - 0.5) * 1.1;
+        kick = Math.sin(Math.min(1, h.p * 1.6) * Math.PI);
+        if (h.p >= 1) {
+          h.p = -1;
+          h.wait = 1.2 + Math.random() * 3;
+        }
+      } else {
+        h.wait -= delta;
+        if (h.wait <= 0) {
+          const home = HOPPER_SPOTS[i];
+          for (let tries = 0; tries < 6; tries++) {
+            const a = Math.random() * Math.PI * 2;
+            const reach = 0.8 + Math.random() * 1.2;
+            const tx = h.x + Math.cos(a) * reach;
+            const tz = h.z + Math.sin(a) * reach;
+            if (clearing(tx, tz) > 0.4 && Math.hypot(tx - home.x, tz - home.z) < 3.5) {
+              h.fx = h.x;
+              h.fz = h.z;
+              h.tx = tx;
+              h.tz = tz;
+              h.heading = Math.atan2(tx - h.x, tz - h.z);
+              h.peak = 0.75 + Math.random() * 0.4;
+              h.dur = 0.5 + Math.random() * 0.25;
+              h.p = 0;
+              break;
+            }
+          }
+          if (h.p < 0) h.wait = 0.5;
+        }
+      }
+      g.position.set(h.x, y, h.z);
+      g.rotation.set(pitch, h.heading, 0, "YXZ");
+      for (const side of [0, 1]) {
+        const hip = hips.current[i * 2 + side];
+        const knee = knees.current[i * 2 + side];
+        if (hip) hip.rotation.x = 0.32 - kick * 0.45;
+        if (knee) knee.rotation.x = -3.05 + kick * 2.5;
+      }
+    });
+  });
+
+  return (
+    <>
+      {looks.map((look, i) => (
+        <group
+          key={i}
+          ref={(el) => {
+            groups.current[i] = el;
+          }}
+          scale={1.6}
+        >
+          <mesh position={[0, 0, -0.045]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 1, 1.1]} material={look.abdomen}>
+            <capsuleGeometry args={[0.019, 0.08, 4, 10]} />
+          </mesh>
+          <mesh position={[0, 0.006, 0.035]} scale={[1, 1.15, 1.45]} rotation={[-Math.PI / 2, 0, 0]} material={look.thorax}>
+            <sphereGeometry args={[0.022, 12, 10]} />
+          </mesh>
+          <mesh position={[0, 0.004, 0.075]} scale={[0.9, 1.15, 1]} rotation={[0.5, 0, 0]} material={look.head}>
+            <sphereGeometry args={[0.02, 12, 10]} />
+          </mesh>
+          {[-1, 1].map((side) => (
+            <mesh key={`eye${side}`} position={[side * 0.015, 0.013, 0.08]} material={look.eye}>
+              <sphereGeometry args={[0.007, 8, 6]} />
+            </mesh>
+          ))}
+          {[-1, 1].map((side) => (
+            <mesh
+              key={`wing${side}`}
+              position={[side * 0.009, 0.02, -0.03]}
+              rotation={[-Math.PI / 2 - 0.08, side * 0.06, 0]}
+              scale={[0.75, 1, 0.3]}
+              material={look.wing}
+            >
+              <capsuleGeometry args={[0.012, 0.1, 3, 6]} />
+            </mesh>
+          ))}
+          {[-1, 1].map((side, s) => (
+            <group
+              key={`hind${side}`}
+              ref={(el) => {
+                hips.current[i * 2 + s] = el;
+              }}
+              position={[side * 0.026, 0.002, 0.03]}
+            >
+              <mesh position={[0, 0, -0.05]} rotation={[Math.PI / 2, 0, 0]} material={look.femur}>
+                <cylinderGeometry args={[0.005, 0.011, 0.1, 8]} />
+              </mesh>
+              <group
+                ref={(el) => {
+                  knees.current[i * 2 + s] = el;
+                }}
+                position={[0, 0, -0.1]}
+              >
+                <mesh position={[0, 0, -0.045]} rotation={[Math.PI / 2, 0, 0]} material={look.leg}>
+                  <cylinderGeometry args={[0.003, 0.003, 0.09, 5]} />
+                </mesh>
+              </group>
+            </group>
+          ))}
+          {[-1, 1].flatMap((side) =>
+            [0.06, 0.03].map((z) => (
+              <mesh
+                key={`leg${side}${z}`}
+                position={[side * 0.025, -0.014, z]}
+                rotation={[z > 0.04 ? 0.4 : -0.4, 0, side * 0.7]}
+                material={look.leg}
+              >
+                <cylinderGeometry args={[0.0025, 0.0025, 0.05, 4]} />
+              </mesh>
+            )),
+          )}
+          {[-1, 1].map((side) => (
+            <mesh
+              key={`ant${side}`}
+              position={[side * 0.012, 0.03, 0.115]}
+              rotation={[0.9, 0, -side * 0.35]}
+              material={look.leg}
+            >
+              <cylinderGeometry args={[0.0015, 0.002, 0.11, 3]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </>
+  );
+}
+
+const BUTTERFLY_COLORS = ["#f39a2b", "#f5d24a", "#f4efe2", "#7fb2ff", "#f39a2b", "#f5d24a", "#e98aa8", "#f4efe2", "#f39a2b"];
+
+function createWingTexture(color: string) {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, size, size);
+    const edge = ctx.createRadialGradient(0, size / 2, size * 0.25, 0, size / 2, size * 0.95);
+    edge.addColorStop(0, "rgba(20, 14, 10, 0)");
+    edge.addColorStop(0.7, "rgba(20, 14, 10, 0.15)");
+    edge.addColorStop(1, "rgba(20, 14, 10, 0.95)");
+    ctx.fillStyle = edge;
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = "rgba(20, 14, 10, 0.35)";
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, size / 2);
+      ctx.lineTo(size, (i + 0.5) * (size / 4));
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    for (const [x, y] of [[52, 14], [56, 26], [50, 44], [44, 54]]) {
+      ctx.beginPath();
+      ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  return canvasTexture(canvas);
+}
+
+function createWingGeometry() {
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0.01);
+  shape.bezierCurveTo(0.04, 0.13, 0.17, 0.15, 0.16, 0.05);
+  shape.bezierCurveTo(0.15, 0.0, 0.13, -0.02, 0.1, -0.02);
+  shape.bezierCurveTo(0.13, -0.08, 0.09, -0.13, 0.04, -0.1);
+  shape.lineTo(0, -0.02);
+  const geo = new THREE.ShapeGeometry(shape, 10);
+  geo.computeBoundingBox();
+  const box = geo.boundingBox ?? new THREE.Box3();
+  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const uv = geo.attributes.uv as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    uv.setXY(
+      i,
+      (pos.getX(i) - box.min.x) / (box.max.x - box.min.x),
+      (pos.getY(i) - box.min.y) / (box.max.y - box.min.y),
+    );
+  }
+  geo.rotateX(Math.PI / 2);
+  return geo;
+}
+
+function Butterflies({ nightMix }: { nightMix: MutableRefObject<number> }) {
+  const groups = useRef<(THREE.Group | null)[]>([]);
+  const leftWings = useRef<(THREE.Mesh | null)[]>([]);
+  const rightWings = useRef<(THREE.Mesh | null)[]>([]);
+  const wing = useMemo(() => createWingGeometry(), []);
+  const flyers = useMemo(
+    () =>
+      BUTTERFLY_COLORS.map((color, i) => ({
+        material: new THREE.MeshStandardMaterial({
+          map: createWingTexture(color),
+          side: THREE.DoubleSide,
+          transparent: true,
+          roughness: 0.8,
+        }),
+        cx: BUTTERFLY_SPOTS[i % BUTTERFLY_SPOTS.length].x,
+        cz: BUTTERFLY_SPOTS[i % BUTTERFLY_SPOTS.length].z,
+        radius: 1 + seeded(i + 551) * 1.4,
+        lift: 0.75 + seeded(i + 701) * 0.35,
+        speed: 0.6 + seeded(i + 801) * 0.5,
+        phase: seeded(i + 901) * Math.PI * 2,
+        size: 1 + seeded(i + 1001) * 0.35,
+      })),
+    [],
+  );
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const day = 1 - nightMix.current;
+    flyers.forEach((f, i) => {
+      const g = groups.current[i];
+      const l = leftWings.current[i];
+      const r = rightWings.current[i];
+      if (!g || !l || !r) return;
+      g.visible = day > 0.02;
+      if (!g.visible) return;
+      f.material.opacity = day;
+      const at = (time: number) => {
+        const s = time * f.speed;
+        const x = f.cx + Math.sin(s * 0.5 + f.phase) * f.radius + Math.sin(s * 1.3 + f.phase * 2) * 0.15;
+        const z = f.cz + Math.cos(s * 0.37 + f.phase) * f.radius * 0.8 + Math.cos(s * 1.1) * 0.1;
+        return { x, z };
+      };
+      const now = at(t);
+      const next = at(t + 0.08);
+      const flap = Math.sin(t * (13 + f.speed * 4) + f.phase);
+      g.position.set(
+        now.x,
+        groundHeight(now.x, now.z) + f.lift + Math.sin(t * 1.3 + f.phase) * 0.18 + flap * 0.02,
+        now.z,
+      );
+      g.rotation.y = Math.atan2(next.x - now.x, next.z - now.z);
+      const open = 0.25 + (flap * 0.5 + 0.5) * 1.05;
+      r.rotation.z = open;
+      l.rotation.z = -open;
+    });
+  });
+
+  return (
+    <>
+      {flyers.map((f, i) => (
+        <group
+          key={i}
+          ref={(el) => {
+            groups.current[i] = el;
+          }}
+          scale={f.size}
+        >
+          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <capsuleGeometry args={[0.008, 0.09, 3, 6]} />
+            <meshStandardMaterial color="#2a1d14" />
+          </mesh>
+          <mesh
+            ref={(el) => {
+              rightWings.current[i] = el;
+            }}
+            geometry={wing}
+            material={f.material}
+          />
+          <mesh
+            ref={(el) => {
+              leftWings.current[i] = el;
+            }}
+            geometry={wing}
+            material={f.material}
+            scale={[-1, 1, 1]}
+          />
+        </group>
+      ))}
+    </>
+  );
+}
+
 type Props = {
   count: number;
   pointer: MutableRefObject<MotionLabPointer | null>;
@@ -1493,6 +2077,9 @@ export function MotionLabGrassScene({ count, pointer, night }: Props) {
       <Landscape water={waterMaterial} porchLight={porchRef} />
       <instancedMesh ref={meshRef} args={[geometry, material, count]} frustumCulled={false} />
       <points geometry={fireflyGeometry} material={fireflyMaterial} frustumCulled={false} />
+      <Butterflies nightMix={nightMix} />
+      <Dragonflies nightMix={nightMix} />
+      <Grasshoppers nightMix={nightMix} />
       {ribbons.map((ribbon) => (
         <mesh key={ribbon.mat.uuid} geometry={ribbon.geo} material={ribbon.mat} frustumCulled={false} />
       ))}

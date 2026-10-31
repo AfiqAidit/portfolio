@@ -72,7 +72,7 @@ export const sideProjects: SideProject[] = [
       "Thousands of grass blades with wind sway",
       "Speed-based gust and a fading wind trail",
       "Stilt house, chicken coop, pond, and drifting clouds",
-      "Day and night switch with moonlight, stars, and fireflies",
+      "Day and night switch: butterflies, dragonflies, and grasshoppers by day, fireflies and stars by night",
       "Looping wind track, on when the page opens",
       "Quality scaling and reduced-motion fallback",
     ],
