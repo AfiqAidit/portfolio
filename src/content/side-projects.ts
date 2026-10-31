@@ -67,10 +67,11 @@ export const sideProjects: SideProject[] = [
     title: "Motion lab",
     inspiredBy: "interactive nature scenes",
     description:
-      "A green WebGL meadow: grass bends and parts under your cursor, then springs back, with soft pollen in the air.",
+      "A WebGL kampung field at golden hour. Your cursor is a gust: the faster you move, the harder the grass bends, then it stands back up.",
     features: [
-      "Thousands of green grass blades with wind sway",
-      "Cursor gust bends the tips; roots stay planted",
+      "Thousands of grass blades with wind sway",
+      "Speed-based gust and a fading wind trail",
+      "Stilt house, chicken coop, pond, and drifting clouds",
       "Looping wind track, on when the page opens",
       "Quality scaling and reduced-motion fallback",
     ],

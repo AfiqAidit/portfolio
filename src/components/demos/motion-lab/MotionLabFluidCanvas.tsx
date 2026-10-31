@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createFluidSimulation, fluidQuality, type FluidSimulation } from "@/lib/motion-lab/fluid-sim";
+import { createFluidSimulation, fluidQuality } from "@/lib/motion-lab/fluid-sim";
 
 type PointerDetail = {
   x: number;

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/immutability -- three.js buffers and uniforms are mutated per frame inside useFrame */
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
@@ -12,7 +13,26 @@ const GRID = 80;
 const BEND_LIFE = 3.4;
 const BEND_HOLD = 0.45;
 const POND = { x: 4.6, z: -5.4, rx: 2.7, rz: 1.5 };
-const HOUSE = { x: -7.2, z: -8.2 };
+const HOUSE = { x: -7.2, z: -8.2, turn: 0.5, scale: 1.35 };
+
+function homeToWorld(lx: number, lz: number) {
+  const x = lx * HOUSE.scale;
+  const z = lz * HOUSE.scale;
+  const c = Math.cos(HOUSE.turn);
+  const s = Math.sin(HOUSE.turn);
+  return { x: HOUSE.x + x * c + z * s, z: HOUSE.z - x * s + z * c };
+}
+
+const YARD = homeToWorld(0, 2.6);
+const BARN = homeToWorld(-2.3, -0.7);
+const BARN_FRONT = homeToWorld(-2.15, 0.25);
+const APRON = { x: YARD.x + 0.55, z: YARD.z + 1.75 };
+const PATH = [
+  { x: YARD.x, z: YARD.z },
+  { x: -3.4, z: -4.4 },
+  { x: -1, z: -4.5 },
+  { x: 1.6, z: -5.2 },
+];
 
 function smooth(edge0: number, edge1: number, v: number) {
   const t = Math.min(1, Math.max(0, (v - edge0) / (edge1 - edge0)));
@@ -21,6 +41,48 @@ function smooth(edge0: number, edge1: number, v: number) {
 
 function pondDistance(x: number, z: number) {
   return Math.hypot((x - POND.x) / POND.rx, (z - POND.z) / POND.rz);
+}
+
+function pathNearest(x: number, z: number) {
+  let best = Infinity;
+  let nearZ = 0;
+  for (let i = 0; i < PATH.length - 1; i++) {
+    const a = PATH[i];
+    const b = PATH[i + 1];
+    const abx = b.x - a.x;
+    const abz = b.z - a.z;
+    const t = Math.min(1, Math.max(0, ((x - a.x) * abx + (z - a.z) * abz) / (abx * abx + abz * abz)));
+    const pz = a.z + abz * t;
+    const d = Math.hypot(x - (a.x + abx * t), z - pz);
+    if (d < best) {
+      best = d;
+      nearZ = pz;
+    }
+  }
+  return { distance: best, nearZ };
+}
+
+function pathDistance(x: number, z: number) {
+  return pathNearest(x, z).distance;
+}
+
+/** Shortens grass on the camera side of the path so the path stays visible. */
+function pathFrontScale(x: number, z: number) {
+  const { distance, nearZ } = pathNearest(x, z);
+  if (z <= nearZ) return 1;
+  return Math.min(1, 0.2 + 0.17 * Math.max(0, distance - 0.5));
+}
+
+/** Negative inside the swept yard and path, positive in the grass. */
+function clearing(x: number, z: number) {
+  return Math.min(
+    Math.hypot(x - HOUSE.x, z - HOUSE.z) - 2.3,
+    Math.hypot(x - YARD.x, z - YARD.z) - 2.2,
+    Math.hypot(x - APRON.x, z - APRON.z) - 1.6,
+    Math.hypot(x - BARN.x, z - BARN.z) - 1.1,
+    Math.hypot(x - BARN_FRONT.x, z - BARN_FRONT.z) - 1.0,
+    pathDistance(x, z) - 0.55,
+  );
 }
 
 function groundHeight(x: number, z: number) {
@@ -301,7 +363,7 @@ function createBladeGeometry() {
 }
 
 function createTerrain() {
-  const geo = new THREE.PlaneGeometry(120, 84, 200, 140);
+  const geo = new THREE.PlaneGeometry(120, 84, 300, 210);
   geo.rotateX(-Math.PI / 2);
   geo.translate(0, 0, -20);
   const pos = geo.attributes.position as THREE.BufferAttribute;
@@ -310,6 +372,7 @@ function createTerrain() {
   const slope = new THREE.Color("#3f7a3f");
   const crest = new THREE.Color("#8aa95a");
   const mud = new THREE.Color("#4a4026");
+  const dirt = new THREE.Color("#8d7650");
   const col = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
@@ -319,6 +382,8 @@ function createTerrain() {
     col.copy(field).lerp(slope, smooth(0.3, 2.2, y));
     col.lerp(crest, smooth(2.6, 5.5, y) * 0.7);
     col.lerp(mud, (1 - smooth(1.0, 1.25, pondDistance(x, z))) * 0.8);
+    const speckle = Math.sin(x * 7.1 + z * 3.3) * Math.sin(z * 6.7 - x * 2.9) * 0.08;
+    col.lerp(dirt, (1 - smooth(-0.35, 0.2, clearing(x, z))) * (0.85 + speckle));
     colors.set([col.r, col.g, col.b], i * 3);
   }
   geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
@@ -327,8 +392,8 @@ function createTerrain() {
 }
 
 const TREES = [
-  [-9.6, -9.8, 1.1],
-  [-5.2, -10.4, 0.85],
+  [-12.6, -12, 1.1],
+  [-2.4, -13, 0.9],
   [-12.5, -15.5, 1.3],
   [-16, -19, 1.5],
   [-10, -21, 1.2],
@@ -408,33 +473,348 @@ function Landscape({ water }: { water: THREE.ShaderMaterial }) {
       {TREES.map(([x, z, size]) => (
         <Tree key={`${x}-${z}`} x={x} z={z} size={size} />
       ))}
-      <group position={[HOUSE.x, houseY, HOUSE.z]} rotation={[0, 0.5, 0]}>
-        {[
-          [-0.72, 0.32, -0.42],
-          [0.72, 0.32, -0.42],
-          [-0.72, 0.32, 0.42],
-          [0.72, 0.32, 0.42],
-        ].map((p) => (
-          <mesh key={p.join()} position={p as [number, number, number]}>
-            <cylinderGeometry args={[0.055, 0.07, 0.64, 6]} />
-            <meshStandardMaterial color="#6a4630" roughness={0.9} />
-          </mesh>
+      <group position={[HOUSE.x, houseY, HOUSE.z]} rotation={[0, HOUSE.turn, 0]} scale={HOUSE.scale}>
+        <Homestead />
+      </group>
+      {CHICKENS.map((chicken) => (
+        <Chicken key={chicken.seed} {...chicken} />
+      ))}
+    </group>
+  );
+}
+
+const WOOD = "#9a6a42";
+const WOOD_DARK = "#5a3622";
+const ROOF = "#8f3b2c";
+
+function RoofPrism({
+  half,
+  height,
+  length,
+  color,
+  position,
+  map,
+}: {
+  half: number;
+  height: number;
+  length: number;
+  color: string;
+  position: [number, number, number];
+  map?: THREE.Texture;
+}) {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-half, 0);
+    shape.lineTo(half, 0);
+    shape.lineTo(0, height);
+    shape.closePath();
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: length, bevelEnabled: false });
+    geo.translate(0, 0, -length / 2);
+    geo.rotateY(Math.PI / 2);
+    geo.computeVertexNormals();
+    return geo;
+  }, [half, height, length]);
+
+  return (
+    <mesh geometry={geometry} position={position}>
+      <meshStandardMaterial color={color} map={map ?? null} roughness={0.85} />
+    </mesh>
+  );
+}
+
+function Block({
+  size,
+  position,
+  color,
+  rotation,
+  glow,
+  map,
+}: {
+  size: [number, number, number];
+  position: [number, number, number];
+  color: string;
+  rotation?: [number, number, number];
+  glow?: boolean;
+  map?: THREE.Texture;
+}) {
+  return (
+    <mesh position={position} rotation={rotation}>
+      <boxGeometry args={size} />
+      <meshStandardMaterial
+        color={color}
+        map={map ?? null}
+        roughness={0.9}
+        emissive={glow ? "#ffb04a" : "#000000"}
+        emissiveIntensity={glow ? 1.4 : 0}
+      />
+    </mesh>
+  );
+}
+
+function Post({
+  x,
+  z,
+  height,
+  radius = 0.045,
+  color = WOOD_DARK,
+}: {
+  x: number;
+  z: number;
+  height: number;
+  radius?: number;
+  color?: string;
+}) {
+  return (
+    <mesh position={[x, height / 2, z]}>
+      <cylinderGeometry args={[radius, radius * 1.2, height, 6]} />
+      <meshStandardMaterial color={color} roughness={0.95} />
+    </mesh>
+  );
+}
+
+const HOUSE_POSTS = [-1, -0.33, 0.33, 1].flatMap((x) => [-0.6, 0.6].map((z) => ({ x, z })));
+const BALUSTERS = [-0.56, -0.44, -0.32, 0.32, 0.44, 0.56];
+
+function Homestead() {
+  return (
+    <group>
+      {HOUSE_POSTS.map((p) => (
+        <Post key={`${p.x}-${p.z}`} x={p.x} z={p.z} height={0.8} />
+      ))}
+      <Block size={[2.2, 0.1, 1.4]} position={[0, 0.82, 0]} color={WOOD_DARK} />
+      <Block size={[2, 0.86, 1.2]} position={[0, 1.3, 0]} color={WOOD} />
+      <Block size={[2.02, 0.12, 1.22]} position={[0, 1.67, 0]} color="#e8d6b0" />
+      {[-0.72, 0.72].map((x) => (
+        <group key={x}>
+          <Block size={[0.4, 0.44, 0.015]} position={[x, 1.28, 0.6]} color={WOOD_DARK} />
+          <Block size={[0.3, 0.34, 0.02]} position={[x, 1.28, 0.605]} color="#ffd28a" glow />
+        </group>
+      ))}
+      <Block size={[0.02, 0.34, 0.3]} position={[1.005, 1.28, 0]} color="#ffd28a" glow />
+      <Block size={[0.34, 0.64, 0.02]} position={[0, 1.2, 0.605]} color={WOOD_DARK} />
+      <RoofPrism half={0.92} height={0.78} length={2.6} color={ROOF} position={[0, 1.73, 0]} />
+      {[-1.3, 1.3].map((x) => (
+        <group key={x} position={[x, 2.56, 0]}>
+          <Block size={[0.04, 0.42, 0.04]} position={[0, 0, 0.07]} rotation={[0.6, 0, 0]} color={WOOD_DARK} />
+          <Block size={[0.04, 0.42, 0.04]} position={[0, 0, -0.07]} rotation={[-0.6, 0, 0]} color={WOOD_DARK} />
+        </group>
+      ))}
+
+      {[-0.6, 0.6].map((x) => (
+        <Post key={x} x={x} z={1.32} height={1.44} radius={0.04} />
+      ))}
+      <Block size={[1.3, 0.08, 0.75]} position={[0, 0.62, 0.98]} color={WOOD_DARK} />
+      <Block size={[1.5, 0.05, 0.95]} position={[0, 1.6, 1.05]} rotation={[0.32, 0, 0]} color={ROOF} />
+      {[-0.41, 0.41].map((x) => (
+        <Block key={x} size={[0.38, 0.04, 0.04]} position={[x, 0.93, 1.33]} color={WOOD_DARK} />
+      ))}
+      {[-0.63, 0.63].map((x) => (
+        <Block key={x} size={[0.04, 0.04, 0.75]} position={[x, 0.93, 0.98]} color={WOOD_DARK} />
+      ))}
+      {BALUSTERS.map((x) => (
+        <Block key={x} size={[0.025, 0.3, 0.025]} position={[x, 0.78, 1.33]} color={WOOD_DARK} />
+      ))}
+      {[0.47, 0.32, 0.17].map((y, i) => (
+        <Block key={y} size={[0.44, 0.05, 0.18]} position={[0, y, 1.47 + i * 0.14]} color={WOOD} />
+      ))}
+      <mesh position={[0.62, 0.13, 1.72]} scale={[1, 1.15, 1]}>
+        <sphereGeometry args={[0.13, 16, 12]} />
+        <meshStandardMaterial color="#7a4a2a" roughness={0.6} />
+      </mesh>
+      <pointLight position={[0, 1.2, 1.1]} color="#ffb35c" intensity={2.2} distance={5} decay={2} />
+
+      <group position={[-2.3, 0, -0.7]} rotation={[0, 0.25, 0]} scale={1.15}>
+        <ChickenCoop />
+      </group>
+    </group>
+  );
+}
+
+const PINE = "#c9a46a";
+const PINE_DARK = "#8a6a3e";
+const PINE_TRIM = "#b08850";
+const DOORWAY = "#2a1a10";
+const IRON = "#9aa0a6";
+const COOP_PITCH = Math.atan2(0.3, 0.35);
+
+function createPlankTexture(boards: number) {
+  const size = 128;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, size, size);
+    const step = size / boards;
+    for (let i = 0; i < boards; i++) {
+      const x = i * step;
+      ctx.fillStyle = `rgba(80, 50, 20, ${0.04 + ((i * 37) % 5) * 0.025})`;
+      ctx.fillRect(x, 0, step, size);
+      ctx.strokeStyle = "rgba(110, 70, 30, 0.16)";
+      ctx.lineWidth = 1;
+      for (let g = 0; g < 3; g++) {
+        const gx = x + step * (0.25 + g * 0.25) + Math.sin(i * 3.1 + g) * 2;
+        ctx.beginPath();
+        ctx.moveTo(gx, 0);
+        ctx.bezierCurveTo(gx + 2, size * 0.33, gx - 2, size * 0.66, gx + 1, size);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(45, 28, 12, 0.6)";
+      ctx.fillRect(x, 0, 2, size);
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+function ChickenCoop() {
+  const walls = useMemo(() => createPlankTexture(6), []);
+  const roof = useMemo(() => createPlankTexture(5), []);
+  const slopeX = 0.28 * Math.cos(COOP_PITCH);
+  const slopeY = 1.24 - 0.28 * Math.sin(COOP_PITCH);
+
+  return (
+    <group>
+      {[-0.32, 0.32].flatMap((x) =>
+        [-0.26, 0.26].map((z) => <Post key={`${x}-${z}`} x={x} z={z} height={0.44} radius={0.03} color={PINE_DARK} />),
+      )}
+      <Block size={[0.76, 0.05, 0.62]} position={[0, 0.445, 0]} color={PINE_DARK} />
+      <Block size={[0.7, 0.46, 0.56]} position={[0, 0.69, 0]} color={PINE} map={walls} />
+      <group rotation={[0, Math.PI / 2, 0]}>
+        <RoofPrism half={0.35} height={0.3} length={0.56} color={PINE} map={walls} position={[0, 0.92, 0]} />
+      </group>
+
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <Block
+            size={[0.56, 0.035, 0.74]}
+            position={[side * slopeX, slopeY, 0]}
+            rotation={[0, 0, -side * COOP_PITCH]}
+            color={PINE}
+            map={roof}
+          />
+          <Block
+            size={[0.5, 0.05, 0.025]}
+            position={[side * slopeX * 0.92, slopeY - 0.03, 0.375]}
+            rotation={[0, 0, -side * COOP_PITCH]}
+            color={PINE_TRIM}
+          />
+          <Block size={[0.04, 0.48, 0.025]} position={[side * 0.335, 0.69, 0.285]} color={PINE_TRIM} />
+          <Block size={[0.06, 0.22, 0.015]} position={[side * 0.17, 0.64, 0.29]} color={PINE_TRIM} />
+          <Block size={[0.045, 0.018, 0.012]} position={[side * 0.2, 0.72, 0.3]} color={IRON} />
+          <Block size={[0.045, 0.018, 0.012]} position={[side * 0.2, 0.56, 0.3]} color={IRON} />
+        </group>
+      ))}
+      <Block size={[0.09, 0.045, 0.78]} position={[0, 1.245, 0]} color={PINE_DARK} />
+
+      <Block size={[0.24, 0.28, 0.008]} position={[0, 0.62, 0.284]} color={PINE_TRIM} />
+      <Block size={[0.16, 0.15, 0.01]} position={[0, 0.58, 0.29]} color={DOORWAY} />
+      <mesh position={[0, 0.655, 0.296]}>
+        <circleGeometry args={[0.08, 20, 0, Math.PI]} />
+        <meshStandardMaterial color={DOORWAY} />
+      </mesh>
+      <Block size={[0.38, 0.035, 0.02]} position={[0, 0.8, 0.29]} color={PINE_TRIM} />
+      <Block size={[0.012, 0.08, 0.2]} position={[0.352, 0.8, 0]} color={DOORWAY} />
+
+      <Block size={[0.2, 0.025, 0.08]} position={[0, 0.47, 0.32]} color={PINE} />
+      <group position={[0, 0.23, 0.62]} rotation={[0.69, 0, 0]}>
+        <Block size={[0.16, 0.022, 0.74]} position={[0, 0, 0]} color={PINE} map={walls} />
+        {[-0.27, -0.135, 0, 0.135, 0.27].map((z) => (
+          <Block key={z} size={[0.16, 0.02, 0.025]} position={[0, 0.02, z]} color={PINE_DARK} />
         ))}
-        <mesh position={[0, 0.7, 0]}>
-          <boxGeometry args={[1.9, 0.1, 1.25]} />
-          <meshStandardMaterial color="#8b6244" />
+      </group>
+    </group>
+  );
+}
+
+const CHICKENS = [
+  { seed: 1, body: "#f4efe4" },
+  { seed: 2, body: "#a8643a" },
+];
+
+function Chicken({ seed, body }: { seed: number; body: string }) {
+  const group = useRef<THREE.Group>(null);
+  const head = useRef<THREE.Group>(null);
+  const walk = useRef({ ready: false, x: 0, z: 0, tx: 0, tz: 0, wait: 0, heading: 0 });
+
+  useFrame((state, delta) => {
+    const g = group.current;
+    const h = head.current;
+    if (!g || !h) return;
+    const w = walk.current;
+    const t = state.clock.elapsedTime + seed * 3.1;
+    const pickTarget = () => {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random()) * 1.5;
+      w.tx = YARD.x + Math.cos(a) * r;
+      w.tz = YARD.z + Math.sin(a) * r;
+    };
+    if (!w.ready) {
+      pickTarget();
+      w.x = w.tx;
+      w.z = w.tz;
+      w.wait = Math.random() * 2;
+      w.ready = true;
+    }
+
+    const dx = w.tx - w.x;
+    const dz = w.tz - w.z;
+    const dist = Math.hypot(dx, dz);
+    let bob = 0;
+    if (w.wait > 0) {
+      w.wait -= delta;
+      h.rotation.x = Math.max(0, Math.sin(t * 5)) * 0.9;
+      if (w.wait <= 0) pickTarget();
+    } else if (dist < 0.05) {
+      w.wait = 1.4 + Math.random() * 3;
+    } else {
+      const step = Math.min(dist, 0.3 * delta);
+      w.x += (dx / dist) * step;
+      w.z += (dz / dist) * step;
+      let turn = Math.atan2(dx, dz) - w.heading;
+      turn = Math.atan2(Math.sin(turn), Math.cos(turn));
+      w.heading += turn * (1 - Math.exp(-delta * 6));
+      bob = Math.abs(Math.sin(t * 13)) * 0.03;
+      h.rotation.x = Math.sin(t * 13) * 0.18;
+    }
+
+    g.position.set(w.x, groundHeight(w.x, w.z) + bob, w.z);
+    g.rotation.y = w.heading;
+  });
+
+  return (
+    <group ref={group} scale={1.4}>
+      <mesh position={[0, 0.17, 0]} scale={[0.13, 0.12, 0.17]}>
+        <sphereGeometry args={[1, 14, 10]} />
+        <meshStandardMaterial color={body} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0.25, -0.15]} rotation={[-0.7, 0, 0]}>
+        <coneGeometry args={[0.07, 0.16, 6]} />
+        <meshStandardMaterial color={body} roughness={0.9} />
+      </mesh>
+      {[-0.04, 0.04].map((x) => (
+        <mesh key={x} position={[x, 0.05, 0]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.1, 4]} />
+          <meshStandardMaterial color="#d99a2b" />
         </mesh>
-        <mesh position={[0, 1.18, 0]}>
-          <boxGeometry args={[1.65, 0.82, 1.05]} />
-          <meshStandardMaterial color="#f3ead8" roughness={0.85} />
+      ))}
+      <group ref={head} position={[0, 0.25, 0.12]}>
+        <mesh position={[0, 0.05, 0.03]}>
+          <sphereGeometry args={[0.065, 12, 10]} />
+          <meshStandardMaterial color={body} roughness={0.9} />
         </mesh>
-        <mesh position={[0, 1.18, 0.53]}>
-          <boxGeometry args={[0.28, 0.42, 0.04]} />
-          <meshStandardMaterial color="#6e3b2a" />
+        <mesh position={[0, 0.12, 0.03]}>
+          <boxGeometry args={[0.02, 0.05, 0.06]} />
+          <meshStandardMaterial color="#c8322a" />
         </mesh>
-        <mesh position={[0, 1.82, 0]} rotation={[0, Math.PI / 4, 0]}>
-          <coneGeometry args={[1.35, 0.62, 4]} />
-          <meshStandardMaterial color="#9c3d32" roughness={0.8} />
+        <mesh position={[0, 0.04, 0.1]} rotation={[Math.PI / 2, 0, 0]}>
+          <coneGeometry args={[0.02, 0.05, 5]} />
+          <meshStandardMaterial color="#e0a02c" />
         </mesh>
       </group>
     </group>
@@ -548,10 +928,13 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
         if (i >= count) break;
         const x = (gx / cols - 0.5) * span + (Math.random() - 0.5) * 0.22;
         const z = (gz / cols - 0.5) * span + (Math.random() - 0.5) * 0.22;
-        if (pondDistance(x, z) < 1.08 || Math.hypot(x - HOUSE.x, z - HOUSE.z) < 1.35) continue;
+        const open = clearing(x, z);
+        if (pondDistance(x, z) < 1.08 || open < (Math.random() - 0.5) * 0.5) continue;
         dummy.position.set(x, groundHeight(x, z) - 0.02, z);
         dummy.rotation.set(-0.08 + Math.random() * 0.08, Math.random() * Math.PI * 2, 0);
-        dummy.scale.setScalar(0.7 + Math.random() * 0.7);
+        dummy.scale.setScalar(
+          (0.7 + Math.random() * 0.7) * (0.45 + 0.55 * smooth(0, 2.4, open)) * pathFrontScale(x, z),
+        );
         dummy.updateMatrix();
         mesh.setMatrixAt(i, dummy.matrix);
         i++;

@@ -55,14 +55,14 @@ export function MotionLabStudio() {
   useEffect(() => {
     if (reduced) {
       mutedRef.current = true;
-      setMuted(true);
       return;
     }
     const audio = createMotionLabAudio();
     if (!audio) return;
     audioRef.current = audio;
-    setAnalyser(audio.analyser);
     void audio.enable().then((playing) => {
+      if (audioRef.current !== audio) return;
+      setAnalyser(audio.analyser);
       if (playing || userMutedRef.current) return;
       mutedRef.current = true;
       setMuted(true);
@@ -150,7 +150,7 @@ export function MotionLabStudio() {
         </Link>
         <div className="flex items-center gap-2">
           <MotionLabSoundControl
-            muted={muted}
+            muted={muted || reduced}
             active={!reduced && analyser !== null}
             analyser={analyser}
             onToggle={onToggleSound}

@@ -3,7 +3,7 @@ import { MotionLabStudio } from "@/components/demos/motion-lab/MotionLabStudio";
 
 const title = "Motion lab";
 const description =
-  "Green WebGL grass that bends and parts under the cursor, then settles back. Soft pollen and optional ambience.";
+  "A WebGL kampung field at golden hour. Your cursor is a gust that bends the grass, with a stilt house, chickens, a pond, and a looping wind track.";
 
 export const metadata: Metadata = {
   title,

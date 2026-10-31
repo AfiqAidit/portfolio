@@ -1,29 +1,20 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function MotionLabCardPreview() {
   return (
     <Link
       href="/demos/motion-lab"
-      className="group/preview relative block aspect-[16/10] w-full overflow-hidden border-b border-border"
+      className="group/preview relative block aspect-[16/10] w-full overflow-hidden border-b border-border bg-[#0f2918]"
     >
-      <div
-        className="absolute inset-0 bg-[#0f2918]"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "linear-gradient(to top, rgb(5 16 8), rgb(22 58 28)), radial-gradient(circle at 50% 20%, rgb(200 230 160 / 0.35), transparent 55%)",
-        }}
+      <Image
+        src="/demos/motion-lab/preview.jpg"
+        alt="WebGL grass field at golden hour with a kampung stilt house, chicken coop, and pond"
+        fill
+        sizes="(min-width: 1024px) 640px, 100vw"
+        className="object-cover transition-transform duration-500 group-hover/preview:scale-[1.03]"
       />
-      <div className="absolute inset-0 flex items-end justify-center gap-0.5 pb-6" aria-hidden>
-        {Array.from({ length: 28 }).map((_, i) => (
-          <span
-            key={i}
-            className="w-1 rounded-full bg-gradient-to-t from-[#1e4d22] to-[#9edc55]"
-            style={{ height: `${22 + (i % 6) * 5}px`, opacity: 0.75 + (i % 3) * 0.08 }}
-          />
-        ))}
-      </div>
-      <p className="absolute top-4 left-4 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase backdrop-blur-sm">
+      <p className="absolute top-4 left-4 rounded-full border border-white/20 bg-black/30 px-2.5 py-1 font-mono text-[9px] tracking-[0.2em] text-white/90 uppercase backdrop-blur-sm">
         Grass field
       </p>
       <span className="pointer-events-none absolute right-3 bottom-3 rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-sm">
