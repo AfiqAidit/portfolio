@@ -433,30 +433,12 @@ function Tree({ x, z, size }: { x: number; z: number; size: number }) {
   );
 }
 
-const REEDS = Array.from({ length: 14 }, (_, i) => {
-  const a = (i / 14) * Math.PI * 2 + Math.sin(i * 7.3) * 0.2;
-  const r = 1.02 + (Math.sin(i * 3.7) * 0.5 + 0.5) * 0.08;
-  return {
-    x: POND.x + Math.cos(a) * POND.rx * r,
-    z: POND.z + Math.sin(a) * POND.rz * r,
-    h: 0.5 + (Math.sin(i * 5.1) * 0.5 + 0.5) * 0.45,
-  };
-});
-
 function Pond({ material }: { material: THREE.ShaderMaterial }) {
   return (
-    <group>
-      <mesh position={[POND.x, 0.02, POND.z]} rotation={[-Math.PI / 2, 0, 0]} scale={[POND.rx, POND.rz, 1]}>
-        <circleGeometry args={[1.04, 48]} />
-        <primitive object={material} attach="material" />
-      </mesh>
-      {REEDS.filter((_, i) => i % 3 !== 1).map((reed) => (
-        <mesh key={`${reed.x}-${reed.z}`} position={[reed.x, reed.h / 2, reed.z]}>
-          <coneGeometry args={[0.025, reed.h, 4]} />
-          <meshStandardMaterial color="#4d6b2a" roughness={1} />
-        </mesh>
-      ))}
-    </group>
+    <mesh position={[POND.x, 0.02, POND.z]} rotation={[-Math.PI / 2, 0, 0]} scale={[POND.rx, POND.rz, 1]}>
+      <circleGeometry args={[1.04, 48]} />
+      <primitive object={material} attach="material" />
+    </mesh>
   );
 }
 
@@ -929,11 +911,13 @@ export function MotionLabGrassScene({ count, pointer }: Props) {
         const x = (gx / cols - 0.5) * span + (Math.random() - 0.5) * 0.22;
         const z = (gz / cols - 0.5) * span + (Math.random() - 0.5) * 0.22;
         const open = clearing(x, z);
-        if (pondDistance(x, z) < 1.08 || open < (Math.random() - 0.5) * 0.5) continue;
+        const pond = pondDistance(x, z);
+        if (pond < 1.16 || open < (Math.random() - 0.5) * 0.5) continue;
+        const pondFront = z > POND.z ? Math.min(1, 0.3 + 0.4 * (pond - 1.16)) : 1;
         dummy.position.set(x, groundHeight(x, z) - 0.02, z);
         dummy.rotation.set(-0.08 + Math.random() * 0.08, Math.random() * Math.PI * 2, 0);
         dummy.scale.setScalar(
-          (0.7 + Math.random() * 0.7) * (0.45 + 0.55 * smooth(0, 2.4, open)) * pathFrontScale(x, z),
+          (0.7 + Math.random() * 0.7) * (0.45 + 0.55 * smooth(0, 2.4, open)) * pathFrontScale(x, z) * pondFront,
         );
         dummy.updateMatrix();
         mesh.setMatrixAt(i, dummy.matrix);
